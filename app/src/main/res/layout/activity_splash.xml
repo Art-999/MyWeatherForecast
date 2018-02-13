@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.arturmusayelyan.myweatherforecast.activites.SplashActivity">
+
+    <Button
+        android:clickable="true"
+        android:focusable="true"
+        android:id="@+id/click_me_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@null"
+        android:text="click me"
+        android:textColor="@color/blue"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/prog_bar_download"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="200dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/progress_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/prog_bar_download"
+        android:gravity="center_horizontal"
+        android:text=""
+        android:textSize="14sp"
+        android:textStyle="bold|italic"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/powered_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="25dp"
+        android:text="powered by Artur Musayelyan"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        android:visibility="gone" />
+
+
+</RelativeLayout>
