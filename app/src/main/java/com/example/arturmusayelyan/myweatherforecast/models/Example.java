@@ -3,149 +3,36 @@ package com.example.arturmusayelyan.myweatherforecast.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 /**
  * Created by artur.musayelyan on 13/02/2018.
  */
 
 public class Example {
-    @SerializedName("coord")
+    @SerializedName("cnt")
     @Expose
-    private Coord coord;
-    @SerializedName("weather")
+    private Integer cnt;
+    @SerializedName("list")
     @Expose
-    private List<Weather> weather = null;
-    @SerializedName("base")
-    @Expose
-    private String base;
-    @SerializedName("main")
-    @Expose
-    private Main main;
-    @SerializedName("visibility")
-    @Expose
-    private Integer visibility;
-    @SerializedName("wind")
-    @Expose
-    private Wind wind;
-    @SerializedName("clouds")
-    @Expose
-    private Clouds clouds;
-    @SerializedName("dt")
-    @Expose
-    private Integer dt;
-    @SerializedName("sys")
-    @Expose
-    private Sys sys;
-    @SerializedName("id")
-    @Expose
-    private Integer id;
-    @SerializedName("name")
-    @Expose
-    private String name;
-    @SerializedName("cod")
-    @Expose
-    private Integer cod;
+    private java.util.List<WeatherList> list = null;
 
-    public Coord getCoord() {
-        return coord;
+    public Integer getCnt() {
+        return cnt;
     }
 
-    public void setCoord(Coord coord) {
-        this.coord = coord;
+    public void setCnt(Integer cnt) {
+        this.cnt = cnt;
     }
 
-    public List<Weather> getWeather() {
-        return weather;
+    public java.util.List<WeatherList> getList() {
+        return list;
     }
 
-    public void setWeather(List<Weather> weather) {
-        this.weather = weather;
+    public void setList(java.util.List<WeatherList> list) {
+        this.list = list;
     }
-
-    public String getBase() {
-        return base;
-    }
-
-    public void setBase(String base) {
-        this.base = base;
-    }
-
-    public Main getMain() {
-        return main;
-    }
-
-    public void setMain(Main main) {
-        this.main = main;
-    }
-
-    public Integer getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(Integer visibility) {
-        this.visibility = visibility;
-    }
-
-    public Wind getWind() {
-        return wind;
-    }
-
-    public void setWind(Wind wind) {
-        this.wind = wind;
-    }
-
-    public Clouds getClouds() {
-        return clouds;
-    }
-
-    public void setClouds(Clouds clouds) {
-        this.clouds = clouds;
-    }
-
-    public Integer getDt() {
-        return dt;
-    }
-
-    public void setDt(Integer dt) {
-        this.dt = dt;
-    }
-
-    public Sys getSys() {
-        return sys;
-    }
-
-    public void setSys(Sys sys) {
-        this.sys = sys;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getCod() {
-        return cod;
-    }
-
-    public void setCod(Integer cod) {
-        this.cod = cod;
-    }
-
 
     @Override
     public String toString() {
-        return "Example{" + "coord=" + coord + ", weather=" + weather + ", base='" + base + '\'' + ", main=" + main + ", visibility=" + visibility + ", wind=" + wind + ", clouds=" + clouds + ", dt=" + dt + ", sys=" + sys + ", id=" + id + ", name='" + name + '\'' + ", cod=" + cod + '}';
+        return "Example{" + "cnt=" + cnt + ", list=" + list + '}';
     }
 }

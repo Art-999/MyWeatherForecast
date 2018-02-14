@@ -8,65 +8,53 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Weather {
-    @SerializedName("temp")
+    @SerializedName("id")
     @Expose
-    private double temp;
-    @SerializedName("pressure")
+    private Integer id;
+    @SerializedName("main")
     @Expose
-    private Integer pressure;
-    @SerializedName("humidity")
+    private String main;
+    @SerializedName("description")
     @Expose
-    private Integer humidity;
-    @SerializedName("temp_min")
+    private String description;
+    @SerializedName("icon")
     @Expose
-    private Double tempMin;
-    @SerializedName("temp_max")
-    @Expose
-    private Double tempMax;
+    private String icon;
 
-    public double getTemp() {
-        return temp;
+    public Integer getId() {
+        return id;
     }
 
-    public void setTemp(double temp) {
-        this.temp = temp;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Integer getPressure() {
-        return pressure;
+    public String getMain() {
+        return main;
     }
 
-    public void setPressure(Integer pressure) {
-        this.pressure = pressure;
+    public void setMain(String main) {
+        this.main = main;
     }
 
-    public Integer getHumidity() {
-        return humidity;
+    public String getDescription() {
+        return description;
     }
 
-    public void setHumidity(Integer humidity) {
-        this.humidity = humidity;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Double getTempMin() {
-        return tempMin;
+    public String getIcon() {
+        return icon;
     }
 
-    public void setTempMin(Double tempMin) {
-        this.tempMin = tempMin;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
-
-    public Double getTempMax() {
-        return tempMax;
-    }
-
-    public void setTempMax(Double tempMax) {
-        this.tempMax = tempMax;
-    }
-
 
     @Override
     public String toString() {
-        return "Weather{" + "temp=" + temp + ", pressure=" + pressure + ", humidity=" + humidity + ", tempMin=" + tempMin + ", tempMax=" + tempMax + '}';
+        return "Weather{" + "id=" + id + ", main='" + main + '\'' + ", description='" + description + '\'' + ", icon='" + icon + '\'' + '}';
     }
 }

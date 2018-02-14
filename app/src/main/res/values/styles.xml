@@ -7,9 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="CustomTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/Fuchsia</item>
-        <item name="colorPrimaryDark">@color/blue</item>
+    <style name="CustomTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#90caf9</item>
+        <item name="colorPrimaryDark">#5d99c6</item>
         <item name="colorAccent">@color/red</item>
     </style>
 

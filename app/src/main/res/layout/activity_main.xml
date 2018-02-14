@@ -6,34 +6,17 @@
     android:layout_height="match_parent"
     tools:context="com.example.arturmusayelyan.myweatherforecast.activites.MainActivity">
 
-    <TextView
-        android:id="@+id/city_tv"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginTop="25dp"
-        android:gravity="center"
-        android:text="Yerevan"
-        android:textSize="23sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/temp_tv"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_below="@id/city_tv"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:paddingLeft="40dp"
-        android:text="temperature :   8º C"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 
 </RelativeLayout>

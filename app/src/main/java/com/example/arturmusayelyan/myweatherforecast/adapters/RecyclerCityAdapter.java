@@ -4,10 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
+import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.List;
 
@@ -16,14 +18,15 @@ import java.util.List;
  */
 
 public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapter.MyViewHolder> {
-    private List<String> cityList;
+    private List<WeatherList> dataList;
     private RecyclerCityClick recyclerCityClick;
 
-    public RecyclerCityAdapter(List<String> cityList) {
-        this.cityList = cityList;
+    public RecyclerCityAdapter(List<WeatherList> dataList) {
+        this.dataList = dataList;
     }
-    public void setCityClickListener(RecyclerCityClick cityClick){
-        this.recyclerCityClick=cityClick;
+
+    public void setCityClickListener(RecyclerCityClick cityClick) {
+        this.recyclerCityClick = cityClick;
     }
 
     @Override
@@ -34,30 +37,33 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        String cityName = cityList.get(position);
-        holder.cityTv.setText(cityName);
+        WeatherList currentWeather = dataList.get(position);
+        holder.cityTv.setText(currentWeather.getName());
+        holder.tempratureTv.setText(String.valueOf(currentWeather.getMain().getTemp()));
     }
 
     @Override
     public int getItemCount() {
-        if (cityList != null) {
-            return cityList.size();
-        }
-        return 0;
+
+        return dataList.size();
     }
 
-    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView cityTv;
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TextView cityTv, tempratureTv;
+        private ImageView weatherIcon;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             cityTv = itemView.findViewById(R.id.row_city_tv);
-            cityTv.setOnClickListener(this);
+            tempratureTv = itemView.findViewById(R.id.row_temp_tv);
+            weatherIcon = itemView.findViewById(R.id.row_city_image);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            recyclerCityClick.cityClick(cityTv.getText().toString());
+            //recyclerCityClick.cityClick(cityTv.getText().toString());
+            recyclerCityClick.cityClick(dataList.get(getAdapterPosition()));
         }
     }
 }
