@@ -65,12 +65,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
         doGroupCityCall();
 
-        try {
-            readJsonFile();
-            Log.d("Artur",localJsonString);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//           // readJsonFile();
+//            Log.d("Artur",localJsonString);
+////        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
