@@ -1,22 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.arturmusayelyan.myweatherforecast.activites.MainActivity">
 
+    <include layout="@layout/toolbar_main" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <View
+        android:id="@+id/v_line"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:background="@android:color/white"
+        android:layout_height="1dp"
+        android:layout_below="@+id/toolbar"
+        android:background="@color/mainLineColorBlue" />
+
+    <ImageView
+        android:id="@+id/slaq_button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:layout_height="25dp"
+        android:layout_below="@id/v_line"
+        android:layout_centerHorizontal="true"
+        android:background="@color/mainLineColorBlue"
+        android:src="@drawable/slaq" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/slaq_button">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    <!--<ProgressBar-->
+    <!--android:id="@+id/progress_bar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@android:color/white"-->
+    <!--android:visibility="gone" />-->
+    <include layout="@layout/progress_layout">
+
+    </include>
 
 
 </RelativeLayout>

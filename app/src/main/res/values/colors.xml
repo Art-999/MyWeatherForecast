@@ -7,4 +7,9 @@
     <color name="blue">#66ccff</color>
     <color name="Fuchsia">#ff00ff</color>
     <color name="yellow">#ffff66</color>
+    <color name="light_blue">#90caf9</color>
+    <color name="mainLineColorBlue">#678ba6</color>
+    <color name="rowBackground">#90caf9</color>
+    <color name="default_text_color">#555577</color>
+    <color name="white">#ffffff</color>
 </resources>

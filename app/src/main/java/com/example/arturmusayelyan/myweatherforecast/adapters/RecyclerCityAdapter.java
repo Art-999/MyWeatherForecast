@@ -38,8 +38,12 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         WeatherList currentWeather = dataList.get(position);
-        holder.cityTv.setText(currentWeather.getName());
-        holder.tempratureTv.setText(String.valueOf(currentWeather.getMain().getTemp()));
+        String currentWeatherName=currentWeather.getName();
+        if(currentWeatherName.length()>10){
+            holder.cityTv.setTextSize(16);
+        }
+        holder.cityTv.setText(currentWeatherName);
+        holder.tempratureTv.setText((int)Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp()))+"º C");
     }
 
     @Override
