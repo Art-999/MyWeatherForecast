@@ -12,6 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
@@ -19,9 +22,12 @@ import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.models.City;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
+import com.example.arturmusayelyan.myweatherforecast.models.Main;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
@@ -33,6 +39,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,9 +58,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     private List<City> citysList;
     private View includeProgressView;
     private SearchView searchView;
-    private EditText searchEditText;
     private List<WeatherList> dataList;
     private String localJsonString;
+
+    private TextView toolbarTitle;
+    private ImageView toolbarImage;
+    private RelativeLayout searchIncludeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +71,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         init();
-        //createCitysList();
-
         doGroupCityCall();
-
-//        try {
-//           // readJsonFile();
-//            Log.d("Artur",localJsonString);
-////        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
@@ -78,22 +79,34 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         recyclerView = findViewById(R.id.recycler_view);
         includeProgressView = findViewById(R.id.progress_layout);
         includeProgressView.setVisibility(View.VISIBLE);
+        toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarImage = findViewById(R.id.toolbar_image_view);
+        searchIncludeLayout=findViewById(R.id.search_include_layout);
 
         searchView = findViewById(R.id.search_view);
-        searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        searchEditText.setTextColor(getResources().getColor(R.color.default_text_color));
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.white));
         searchEditText.setHint(getResources().getString(R.string.search_hint));
-        searchEditText.setBackgroundColor(getResources().getColor(R.color.white));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.yellow));
+        searchEditText.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbarTitle.setVisibility(View.GONE);
+                toolbarImage.setVisibility(View.GONE);
+
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 UIUtil.hideKeyboard(MainActivity.this);
-                for (int i = 0; i <dataList.size(); i++) {
-                 if(query.equalsIgnoreCase(dataList.get(i).getName())){
-                     Toast.makeText(MainActivity.this,"This city already exist in screen",Toast.LENGTH_SHORT).show();
+                for (int i = 0; i < dataList.size(); i++) {
+                    if (query.equalsIgnoreCase(dataList.get(i).getName())) {
+                        Toast.makeText(MainActivity.this, "This city already exist in screen", Toast.LENGTH_SHORT).show();
 //                     if(i>=5){
-                         recyclerView.smoothScrollToPosition(i);
- //                    }
+                        recyclerView.smoothScrollToPosition(i);
+                        //                    }
 //                     else if(i==4){
 //                         recyclerView.smoothScrollToPosition(i-4);
 //                     }
@@ -110,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 //                         recyclerView.smoothScrollToPosition(i);
 //                     }
 
-                     return false;
-                 }
+                        return false;
+                    }
                 }
                 return false;
             }
@@ -126,6 +139,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             public boolean onClose() {
                 UIUtil.hideKeyboard(MainActivity.this);
                 recyclerView.smoothScrollToPosition(0);
+
+                toolbarTitle.setVisibility(View.VISIBLE);
+                toolbarImage.setVisibility(View.VISIBLE);
                 return false;
             }
         });
@@ -134,7 +150,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                doGroupCityCall();
+            //    doGroupCityCall();
+                doSeparateCityCall();
             }
         });
         layoutManager = new LinearLayoutManager(this);
@@ -148,22 +165,22 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
     private void createCitysList() {
         citysList = new ArrayList<>();
-        citysList.add(new City("Yerevan", "616052"));
-        citysList.add(new City("Abovyan", "617026"));
-        citysList.add(new City("Vanadzor", "616530"));
-        citysList.add(new City("Hrazdan", "616629"));
-        citysList.add(new City("Masis", "823816"));
-        citysList.add(new City("Kapan", "174875"));
-        citysList.add(new City("Goris", "174895"));
-        citysList.add(new City("Gavar", "616599"));
-        citysList.add(new City("Gyumri", "616635"));
-        citysList.add(new City("Meghri", "174823"));
-        citysList.add(new City("Aparan", "616953"));
-        citysList.add(new City("Tashir", "616178"));
-        citysList.add(new City("Alaverdi", "616974"));
-        citysList.add(new City("Yeghegnadzor", "174710"));
-        citysList.add(new City("Dilijan", "616752"));
-        citysList.add(new City("Echmiadzin", "866096"));
+//        citysList.add(new City("Yerevan", "616052"));
+//        citysList.add(new City("Abovyan", "617026"));
+//        citysList.add(new City("Vanadzor", "616530"));
+//        citysList.add(new City("Hrazdan", "616629"));
+//        citysList.add(new City("Masis", "823816"));
+//        citysList.add(new City("Kapan", "174875"));
+//        citysList.add(new City("Goris", "174895"));
+//        citysList.add(new City("Gavar", "616599"));
+//        citysList.add(new City("Gyumri", "616635"));
+//        citysList.add(new City("Meghri", "174823"));
+//        citysList.add(new City("Aparan", "616953"));
+//        citysList.add(new City("Tashir", "616178"));
+//        citysList.add(new City("Alaverdi", "616974"));
+//        citysList.add(new City("Yeghegnadzor", "174710"));
+//        citysList.add(new City("Dilijan", "616752"));
+//        citysList.add(new City("Echmiadzin", "866096"));
     }
 
     private void initRecCityAdapter(List<WeatherList> dataList) {
@@ -215,6 +232,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             }
         });
     }
+    private void doSeparateCityCall(){
+        Call<Main> call=apiInterface.getCityWeather();
+        call.enqueue(new Callback<Main>() {
+            @Override
+            public void onResponse(Call<Main> call, Response<Main> response) {
+                Log.d("Weather",response.body()+"");
+
+                Main mainData= (Main) response.body();
+                Log.d("Weather",String.valueOf(mainData.getTemp().intValue()));
+            }
+
+            @Override
+            public void onFailure(Call<Main> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Check your Internet Connection", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
 
     private void progressStop() {
@@ -252,6 +286,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         }
 
         localJsonString = writer.toString();
+        Log.d("Art", localJsonString);
+    }
+
+    private List<City> gsonParceToList(String gsonObject) {
+        Gson gson = new Gson();
+        Type exampleListType = new TypeToken<List<City>>() {
+        }.getType();
+        List<City> dataList = gson.fromJson(gsonObject, exampleListType);
+        return dataList;
     }
 
 }
