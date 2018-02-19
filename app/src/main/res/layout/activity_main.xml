@@ -42,12 +42,20 @@
     <!--android:layout_height="match_parent"-->
     <!--android:background="@android:color/white"-->
     <!--android:visibility="gone" />-->
-    <include layout="@layout/progress_layout">
 
-    </include>
+    <!---->
+    <!--<include layout="@layout/progress_layout">-->
+
+    <!--</include>-->
 
     <!--<Loader mode = "2">-->
     <!--</Loader>-->
+<com.example.arturmusayelyan.myweatherforecast.views.Loader
+    android:id="@+id/custom_loader"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone">
 
+</com.example.arturmusayelyan.myweatherforecast.views.Loader>
 
 </RelativeLayout>

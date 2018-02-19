@@ -26,6 +26,7 @@ import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
+import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     private ImageView toolbarImage;
     private RelativeLayout searchIncludeLayout;
 
+    private Loader loader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +80,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
     private void init() {
         recyclerView = findViewById(R.id.recycler_view);
-        includeProgressView = findViewById(R.id.progress_layout);
-        includeProgressView.setVisibility(View.VISIBLE);
+        loader = findViewById(R.id.custom_loader);
+//        includeProgressView = findViewById(R.id.progress_layout);
+//        includeProgressView.setVisibility(View.VISIBLE);
         toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarImage = findViewById(R.id.toolbar_image_view);
         searchIncludeLayout = findViewById(R.id.search_include_layout);
@@ -203,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     }
 
     private void doGroupCityCall() {
+        loader.start();
         Call<Example> call = apiInterface.getCitysWeatherList();
         call.enqueue(new Callback<Example>() {
             @Override
@@ -228,7 +233,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             @Override
             public void onFailure(Call<Example> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Check your Internet Connection", Toast.LENGTH_LONG).show();
-                //finish();
+
+                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
                 progressStop();
             }
         });
@@ -236,6 +245,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
 
     private void doSeparateCityCall(String cityName) {
+        loader.start();
+        final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
         call.enqueue(new Callback<SeparateCity>() {
             @Override
@@ -245,21 +256,43 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
                     Double temp = separateCity.getList().get(0).getMain().getTemp();
                     int tempInt = Integer.valueOf(temp.intValue());
-                    String value = String.valueOf(tempInt);
-                    Toast.makeText(MainActivity.this, value, Toast.LENGTH_SHORT).show();
-                    return;
+                     tempature[0] = String.valueOf(tempInt);
+
                 }
-                Toast.makeText(MainActivity.this, "Type city name in correct", Toast.LENGTH_LONG).show();
+
+                    Thread thread=new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SystemClock.sleep(200);
+                            MainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(tempature[0]!=null) {
+                                        Toast.makeText(MainActivity.this, tempature[0], Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    Toast.makeText(MainActivity.this, "Type city name in correct", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                    });
+                    thread.start();
+
+                progressStop();
+                }
+
+
 
 //                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
 //                    swipeRefreshLayout.setRefreshing(false);
 //                }
-            }
+
 
             @Override
             public void onFailure(Call<SeparateCity> call, Throwable t) {
 //                Log.d("AAAA", t.toString());
                 Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_LONG).show();
+                progressStop();
             }
         });
     }
@@ -269,16 +302,18 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(1500);
+                SystemClock.sleep(200);
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        includeProgressView.setVisibility(View.GONE);
+                        //includeProgressView.setVisibility(View.GONE);
+                        loader.end();
                     }
                 });
             }
         });
         thread.start();
+       // loader.end();
     }
 
     private void readJsonFile() throws IOException {
