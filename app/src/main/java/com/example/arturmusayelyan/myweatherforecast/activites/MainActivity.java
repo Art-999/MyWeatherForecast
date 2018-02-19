@@ -22,7 +22,7 @@ import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.models.City;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
-import com.example.arturmusayelyan.myweatherforecast.models.Main;
+import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         includeProgressView.setVisibility(View.VISIBLE);
         toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarImage = findViewById(R.id.toolbar_image_view);
-        searchIncludeLayout=findViewById(R.id.search_include_layout);
+        searchIncludeLayout = findViewById(R.id.search_include_layout);
 
         searchView = findViewById(R.id.search_view);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -101,31 +101,32 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             @Override
             public boolean onQueryTextSubmit(String query) {
                 UIUtil.hideKeyboard(MainActivity.this);
-                for (int i = 0; i < dataList.size(); i++) {
-                    if (query.equalsIgnoreCase(dataList.get(i).getName())) {
-                        Toast.makeText(MainActivity.this, "This city already exist in screen", Toast.LENGTH_SHORT).show();
-//                     if(i>=5){
-                        recyclerView.smoothScrollToPosition(i);
-                        //                    }
-//                     else if(i==4){
-//                         recyclerView.smoothScrollToPosition(i-4);
-//                     }
-//                     else if(i==3){
-//                         recyclerView.smoothScrollToPosition(i-3);
-//                     }
-//                     else if(i==2){
-//                         recyclerView.smoothScrollToPosition(i-2);
-//                     }
-//                     else if(i==1){
-//                         recyclerView.smoothScrollToPosition(i-1);
-//                     }
-//                     else {
-//                         recyclerView.smoothScrollToPosition(i);
-//                     }
-
-                        return false;
-                    }
-                }
+                doSeparateCityCall(query);
+//                for (int i = 0; i < dataList.size(); i++) {
+//                    if (query.equalsIgnoreCase(dataList.get(i).getName())) {
+//                        Toast.makeText(MainActivity.this, "This city already exist in screen", Toast.LENGTH_SHORT).show();
+////                     if(i>=5){
+//                        recyclerView.smoothScrollToPosition(i);
+//                        //                    }
+////                     else if(i==4){
+////                         recyclerView.smoothScrollToPosition(i-4);
+////                     }
+////                     else if(i==3){
+////                         recyclerView.smoothScrollToPosition(i-3);
+////                     }
+////                     else if(i==2){
+////                         recyclerView.smoothScrollToPosition(i-2);
+////                     }
+////                     else if(i==1){
+////                         recyclerView.smoothScrollToPosition(i-1);
+////                     }
+////                     else {
+////                         recyclerView.smoothScrollToPosition(i);
+////                     }
+//
+//                        return false;
+//                    }
+//                }
                 return false;
             }
 
@@ -150,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-            //    doGroupCityCall();
-                doSeparateCityCall();
+                doGroupCityCall();
+                //doSeparateCityCall();
             }
         });
         layoutManager = new LinearLayoutManager(this);
@@ -232,20 +233,33 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             }
         });
     }
-    private void doSeparateCityCall(){
-        Call<Main> call=apiInterface.getCityWeather();
-        call.enqueue(new Callback<Main>() {
-            @Override
-            public void onResponse(Call<Main> call, Response<Main> response) {
-                Log.d("Weather",response.body()+"");
 
-                Main mainData= (Main) response.body();
-                Log.d("Weather",String.valueOf(mainData.getTemp().intValue()));
+
+    private void doSeparateCityCall(String cityName) {
+        Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
+        call.enqueue(new Callback<SeparateCity>() {
+            @Override
+            public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
+                //Log.d("Weather",response.body()+"");
+                SeparateCity separateCity = response.body();
+                if (separateCity != null && (separateCity.getList().size() > 0)) {
+                    Double temp = separateCity.getList().get(0).getMain().getTemp();
+                    int tempInt = Integer.valueOf(temp.intValue());
+                    String value = String.valueOf(tempInt);
+                    Toast.makeText(MainActivity.this, value, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(MainActivity.this, "Type city name in correct", Toast.LENGTH_LONG).show();
+
+//                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+//                    swipeRefreshLayout.setRefreshing(false);
+//                }
             }
 
             @Override
-            public void onFailure(Call<Main> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Check your Internet Connection", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<SeparateCity> call, Throwable t) {
+//                Log.d("AAAA", t.toString());
+                Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
