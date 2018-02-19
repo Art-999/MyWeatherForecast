@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
                     Thread thread=new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            SystemClock.sleep(200);
+                            SystemClock.sleep(150);
                             MainActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                SystemClock.sleep(200);
+                SystemClock.sleep(150);
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
