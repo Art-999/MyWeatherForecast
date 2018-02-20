@@ -1,7 +1,8 @@
 package com.example.arturmusayelyan.myweatherforecast.activites;
 
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,8 @@ import android.widget.Toast;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
+import com.example.arturmusayelyan.myweatherforecast.fragments.CityFragment;
+import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
 import com.example.arturmusayelyan.myweatherforecast.models.City;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
@@ -65,20 +68,63 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     private TextView toolbarTitle;
     private ImageView toolbarImage;
     private RelativeLayout searchIncludeLayout;
+    private RelativeLayout relativeLayoutForRecycle;
 
     private Loader loader;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        init();
-        doGroupCityCall();
+//        init();
+//        doGroupCityCall();
+        fragmentManager=getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(R.id.base_fragment_container, MainFragment.newInstance(),"mainFragment");
+        MainFragment.vidibility=true;
+        //transaction.addToBackStack("mainFragment");
+        transaction.commit();
+    }
+
+
+    @Override
+    public void cityClick(String cityName) {
+        //     Gson gson = new Gson();
+
+//        Toast toast = Toasty.normal(this, "   " + weatherList.getName() + "   ");
+//        toast.setGravity(Gravity.CENTER, 0, 0);
+//        toast.show();
+//        Intent intent = new Intent(this, WeatherActivity.class);
+//        intent.putExtra(KEY_CITY, gson.toJson(city));
+//        startActivity(intent);
+     //   Toast.makeText(this, weatherList.getName(), Toast.LENGTH_SHORT).show();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        MainFragment.vidibility=false;
+        transaction.add(R.id.base_fragment_container, CityFragment.newInstance(cityName));
+        transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+       // MainFragment mainFragment= (MainFragment) fragmentManager.findFragmentByTag("mainFragment");
+        if(!MainFragment.vidibility) {
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.add(R.id.base_fragment_container, MainFragment.newInstance());
+            MainFragment.vidibility=true;
+            transaction.commit();
+        }
+        else if(MainFragment.vidibility) {
+            super.onBackPressed();
+        }
+
 
     }
 
     private void init() {
+        relativeLayoutForRecycle = findViewById(R.id.relative_for_recycle);
         recyclerView = findViewById(R.id.recycler_view);
         loader = findViewById(R.id.custom_loader);
 //        includeProgressView = findViewById(R.id.progress_layout);
@@ -101,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
             }
         });
+
+//        searchView.animate().x().y().setDuration().alpha().scaleX().start();
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -151,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             }
         });
 
+
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -194,17 +244,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void cityClick(WeatherList weatherList) {
-        //     Gson gson = new Gson();
-
-//        Toast toast = Toasty.normal(this, "   " + weatherList.getName() + "   ");
-//        toast.setGravity(Gravity.CENTER, 0, 0);
-//        toast.show();
-//        Intent intent = new Intent(this, WeatherActivity.class);
-//        intent.putExtra(KEY_CITY, gson.toJson(city));
-//        startActivity(intent);
-    }
 
     private void doGroupCityCall() {
         loader.start();
@@ -213,11 +252,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
                 Log.d("Artur", response.body().toString());
-//                Main mainData=response.body().getMain();
-//
-//                Double temp=mainData.getTemp();
-//                int tempInt=Integer.valueOf(temp.intValue());
-//                Log.d("Artur",tempInt+"");
 
                 dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
@@ -227,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-                progressStop();
+                loader.end();
             }
 
             @Override
@@ -237,8 +271,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-
-                progressStop();
+                loader.end();
+                relativeLayoutForRecycle.setBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.rowBackground));
             }
         });
     }
@@ -256,65 +290,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
                     Double temp = separateCity.getList().get(0).getMain().getTemp();
                     int tempInt = Integer.valueOf(temp.intValue());
-                     tempature[0] = String.valueOf(tempInt);
-
+                    tempature[0] = String.valueOf(tempInt);
                 }
 
-                    Thread thread=new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            SystemClock.sleep(150);
-                            MainActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(tempature[0]!=null) {
-                                        Toast.makeText(MainActivity.this, tempature[0], Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }
-                                    Toast.makeText(MainActivity.this, "Type city name in correct", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        }
-                    });
-                    thread.start();
-
-                progressStop();
+                if (tempature[0] != null) {
+                    loader.end();
+                    Toast.makeText(MainActivity.this, tempature[0], Toast.LENGTH_SHORT).show();
+                    return;
                 }
-
-
-
-//                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-//                    swipeRefreshLayout.setRefreshing(false);
-//                }
+                Toast.makeText(MainActivity.this, "Type city name in correct", Toast.LENGTH_SHORT).show();
+                loader.end();
+            }
 
 
             @Override
             public void onFailure(Call<SeparateCity> call, Throwable t) {
 //                Log.d("AAAA", t.toString());
-                Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_LONG).show();
-                progressStop();
+                Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
+                loader.end();
             }
         });
     }
 
-
-    private void progressStop() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(150);
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //includeProgressView.setVisibility(View.GONE);
-                        loader.end();
-                    }
-                });
-            }
-        });
-        thread.start();
-       // loader.end();
-    }
 
     private void readJsonFile() throws IOException {
         InputStream is = getResources().openRawResource(R.raw.city_list);

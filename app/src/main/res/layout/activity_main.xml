@@ -3,59 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.arturmusayelyan.myweatherforecast.activites.MainActivity">
 
-    <include layout="@layout/toolbar_main" />
-
-    <View
-        android:id="@+id/v_line"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/toolbar"
-        android:background="@color/mainLineColorBlue" />
-
-    <ImageView
-        android:id="@+id/slaq_button"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:layout_below="@id/v_line"
-        android:layout_centerHorizontal="true"
-        android:background="@color/mainLineColorBlue"
-        android:src="@drawable/slaq" />
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/slaq_button">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-
-    <!--<ProgressBar-->
-    <!--android:id="@+id/progress_bar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:background="@android:color/white"-->
-    <!--android:visibility="gone" />-->
-
-    <!---->
-    <!--<include layout="@layout/progress_layout">-->
-
-    <!--</include>-->
-
-    <!--<Loader mode = "2">-->
-    <!--</Loader>-->
-<com.example.arturmusayelyan.myweatherforecast.views.Loader
-    android:id="@+id/custom_loader"
+<FrameLayout
+    android:background="@android:color/white"
+    android:id="@+id/base_fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="gone">
+    android:layout_height="match_parent">
 
-</com.example.arturmusayelyan.myweatherforecast.views.Loader>
+</FrameLayout>
+
 
 </RelativeLayout>

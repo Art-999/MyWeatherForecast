@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.arturmusayelyan.myweatherforecast.activites.MainActivity">
+
+<FrameLayout
+    android:id="@+id/toolbar_layout"
+    android:background="@color/light_blue"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <include layout="@layout/toolbar_main"
+        android:id="@+id/toolbar_main">
+    </include>
+</FrameLayout>
+
+
+    <ImageView
+        android:id="@+id/slaq_button"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@id/toolbar_layout"
+        android:layout_centerHorizontal="true"
+        android:background="@color/mainLineColorBlue"
+        android:src="@drawable/slaq" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/slaq_button">
+
+        <RelativeLayout
+            android:id="@+id/relative_for_recycle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    <com.example.arturmusayelyan.myweatherforecast.views.Loader
+    android:id="@+id/custom_loader"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:mode="1"
+    android:visibility="gone">
+
+    </com.example.arturmusayelyan.myweatherforecast.views.Loader>
+
+</RelativeLayout>

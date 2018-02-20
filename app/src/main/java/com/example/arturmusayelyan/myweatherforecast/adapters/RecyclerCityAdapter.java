@@ -67,7 +67,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
         @Override
         public void onClick(View v) {
             //recyclerCityClick.cityClick(cityTv.getText().toString());
-            recyclerCityClick.cityClick(dataList.get(getAdapterPosition()));
+            recyclerCityClick.cityClick(dataList.get(getAdapterPosition()).getName());
         }
     }
 }
