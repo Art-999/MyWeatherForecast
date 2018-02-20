@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
     private Loader loader;
     private FragmentManager fragmentManager;
+    private MainFragment mainFragment;
+    private CityFragment cityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +82,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        init();
 //        doGroupCityCall();
-        fragmentManager=getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.base_fragment_container, MainFragment.newInstance(),"mainFragment");
-        MainFragment.vidibility=true;
-        //transaction.addToBackStack("mainFragment");
-        transaction.commit();
+
+
+        addMainFragment();
     }
 
 
@@ -99,28 +98,59 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 //        Intent intent = new Intent(this, WeatherActivity.class);
 //        intent.putExtra(KEY_CITY, gson.toJson(city));
 //        startActivity(intent);
-     //   Toast.makeText(this, weatherList.getName(), Toast.LENGTH_SHORT).show();
+        //   Toast.makeText(this, weatherList.getName(), Toast.LENGTH_SHORT).show();
+        addSeparateCityFragment(cityName);
+    }
 
+    public void addSeparateCityFragment(String cityName) {
+        fragmentManager=getSupportFragmentManager();
+        cityFragment=CityFragment.newInstance(cityName);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        MainFragment.vidibility=false;
+        MainFragment.vidibility = false;
+
         transaction.add(R.id.base_fragment_container, CityFragment.newInstance(cityName));
+        transaction.commit();
+    }
+    public void addMainFragment(){
+        fragmentManager = getSupportFragmentManager();
+        mainFragment = MainFragment.newInstance();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(R.id.base_fragment_container, mainFragment, "mainFragment");
+        MainFragment.vidibility = true;
+
+       // transaction.addToBackStack(null);
         transaction.commit();
     }
 
     @Override
     public void onBackPressed() {
-       // MainFragment mainFragment= (MainFragment) fragmentManager.findFragmentByTag("mainFragment");
-        if(!MainFragment.vidibility) {
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.add(R.id.base_fragment_container, MainFragment.newInstance());
-            MainFragment.vidibility=true;
-            transaction.commit();
-        }
-        else if(MainFragment.vidibility) {
-            super.onBackPressed();
-        }
+        // MainFragment mainFragment= (MainFragment) fragmentManager.findFragmentByTag("mainFragment");
 
+//        if(!MainFragment.vidibility) {
+//            FragmentTransaction transaction = fragmentManager.beginTransaction();
+//            transaction.add(R.id.base_fragment_container, MainFragment.newInstance());
+//            MainFragment.vidibility=true;
+//            transaction.commit();
+//        }
+//        else if(MainFragment.vidibility) {
+//            super.onBackPressed();
+//        }
 
+//        if (fragmentManager.getBackStackEntryCount() > 0) {
+//            fragmentManager.popBackStackImmediate();
+//            addMainFragment();
+//
+//            Toast.makeText(this,"Press back again to exit",Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+
+//        if(mainFragment!=null && mainFragment.isVisible()){
+//            super.onBackPressed();
+//        }
+        if(mainFragment!=null && cityFragment.isVisible()){
+            addMainFragment();
+        }
+        super.onBackPressed();
     }
 
     private void init() {
@@ -239,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     }
 
     private void initRecCityAdapter(List<WeatherList> dataList) {
-        adapter = new RecyclerCityAdapter(dataList);
+        adapter = new RecyclerCityAdapter(dataList, this);
         adapter.setCityClickListener(this);
         recyclerView.setAdapter(adapter);
     }

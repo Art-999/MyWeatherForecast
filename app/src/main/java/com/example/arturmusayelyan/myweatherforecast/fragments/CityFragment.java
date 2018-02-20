@@ -1,5 +1,8 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,13 +10,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
@@ -31,12 +42,15 @@ import retrofit2.Response;
  * Created by artur.musayelyan on 20/02/2018.
  */
 
-public class CityFragment extends Fragment {
+public class CityFragment extends Fragment implements View.OnClickListener {
     private TextView dateTimeTV, cityNameTv, weatherDescTv, temperatureTv, windSpeedTv, humidityTv, tempMaxTv, tempMinTv;
+    private ImageView slaqButton,cityMainIcon;
     private String cityName;
     private ApiInterface apiInterface;
     private Loader loader;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    public static String CITY_NAME;
 
     public CityFragment() {
 
@@ -71,6 +85,8 @@ public class CityFragment extends Fragment {
 
         cityName = getArguments().getString("cityName");
 
+        CITY_NAME=cityName;
+
         cityNameTv.setText(cityName);
 
         doSeparateCityCall(cityName);
@@ -86,6 +102,9 @@ public class CityFragment extends Fragment {
         tempMinTv = view.findViewById(R.id.temp_min_tv);
         windSpeedTv = view.findViewById(R.id.wind_speed_tv);
         loader = view.findViewById(R.id.custom_loader);
+        cityMainIcon=view.findViewById(R.id.city_main_icon);
+        slaqButton = view.findViewById(R.id.slaq_button);
+        slaqButton.setOnClickListener(this);
 
         apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
 
@@ -103,6 +122,7 @@ public class CityFragment extends Fragment {
         final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
         call.enqueue(new Callback<SeparateCity>() {
+            @SuppressLint("CheckResult")
             @Override
             public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
                 //Log.d("Weather",response.body()+"");
@@ -117,8 +137,23 @@ public class CityFragment extends Fragment {
                     temperatureTv.setText(tempature[0] + "°C");
                     windSpeedTv.setText(separateCity.getList().get(0).getWind().getSpeed() + "mph");
                     humidityTv.setText(separateCity.getList().get(0).getMain().getHumidity() + "%");
-                    tempMaxTv.setText("max: "+separateCity.getList().get(0).getMain().getTempMax()+"°C");
-                    tempMinTv.setText("min: "+separateCity.getList().get(0).getMain().getTempMin()+"°C");
+                    tempMaxTv.setText("max: " + separateCity.getList().get(0).getMain().getTempMax() + "°C");
+                    tempMinTv.setText("min: " + separateCity.getList().get(0).getMain().getTempMin() + "°C");
+                    Log.d("Art",separateCity.getList().get(0).getWeather().get(0).getIcon());
+
+                    Glide.with(getActivity()).load("http://openweathermap.org/img/w/"+separateCity.getList().get(0).getWeather().get(0).getIcon()+".png").listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
+                        }
+                    }).into(cityMainIcon);
+                   // cityMainIcon.setImageDrawable(Glide.with(getActivity()).load(separateCity.getList().get(0).getWeather().get(0).getIcon()));
+
                 }
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
@@ -147,5 +182,15 @@ public class CityFragment extends Fragment {
                 loader.end();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.slaq_button:
+                //Toast.makeText(getActivity(), "Worked", Toast.LENGTH_SHORT).show();
+                ((MainActivity)getActivity()).addMainFragment();
+                break;
+        }
     }
 }

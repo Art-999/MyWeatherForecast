@@ -19,6 +19,8 @@
 
     <ImageView
         android:id="@+id/slaq_button"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="match_parent"
         android:layout_height="25dp"
         android:layout_below="@id/toolbar_layout"

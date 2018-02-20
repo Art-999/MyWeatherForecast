@@ -65,13 +65,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     private Loader loader;
     private RecyclerCityClick cityClick;
-    public MainFragment(){
+    private ImageView slaqButton;
+
+    public MainFragment() {
 
     }
 
     public static MainFragment newInstance() {
-         Bundle args = new Bundle();
-         MainFragment fragment = new MainFragment();
+        Bundle args = new Bundle();
+        MainFragment fragment = new MainFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -79,7 +81,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.main_fragment,container,false);
+        return inflater.inflate(R.layout.main_fragment, container, false);
     }
 
     @Override
@@ -87,41 +89,43 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         init(view);
         doGroupCityCall();
-        cityClick= (RecyclerCityClick) getActivity();
+        cityClick = (RecyclerCityClick) getActivity();
     }
 
-        private void init(View view) {
-            relativeLayoutForRecycle=view.findViewById(R.id.relative_for_recycle);
-            recyclerView = view.findViewById(R.id.recycler_view);
-            loader = view.findViewById(R.id.custom_loader);
+    private void init(View view) {
+        relativeLayoutForRecycle = view.findViewById(R.id.relative_for_recycle);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        loader = view.findViewById(R.id.custom_loader);
+        slaqButton = view.findViewById(R.id.slaq_button);
+        slaqButton.setOnClickListener(this);
 //        includeProgressView = findViewById(R.id.progress_layout);
 //        includeProgressView.setVisibility(View.VISIBLE);
-            toolbarTitle = view.findViewById(R.id.toolbar_title);
-            toolbarImage = view.findViewById(R.id.toolbar_image_view);
-            searchIncludeLayout = view.findViewById(R.id.search_include_layout);
+        toolbarTitle = view.findViewById(R.id.toolbar_title);
+        toolbarImage = view.findViewById(R.id.toolbar_image_view);
+        searchIncludeLayout = view.findViewById(R.id.search_include_layout);
 
-            searchView = view.findViewById(R.id.search_view);
-            EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-            searchEditText.setTextColor(getResources().getColor(R.color.white));
-            searchEditText.setHint(getResources().getString(R.string.search_hint));
-            searchEditText.setHintTextColor(getResources().getColor(R.color.yellow));
-            searchEditText.setBackgroundColor(getResources().getColor(R.color.light_blue));
-            searchView.setOnSearchClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toolbarTitle.setVisibility(View.GONE);
-                    toolbarImage.setVisibility(View.GONE);
+        searchView = view.findViewById(R.id.search_view);
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.white));
+        searchEditText.setHint(getResources().getString(R.string.search_hint));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.yellow));
+        searchEditText.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbarTitle.setVisibility(View.GONE);
+                toolbarImage.setVisibility(View.GONE);
 
-                }
-            });
+            }
+        });
 
 //        searchView.animate().x().y().setDuration().alpha().scaleX().start();
 
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    UIUtil.hideKeyboard(getActivity());
-                    doSeparateCityCall(query);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                UIUtil.hideKeyboard(getActivity());
+                doSeparateCityCall(query);
 //                for (int i = 0; i < dataList.size(); i++) {
 //                    if (query.equalsIgnoreCase(dataList.get(i).getName())) {
 //                        Toast.makeText(MainActivity.this, "This city already exist in screen", Toast.LENGTH_SHORT).show();
@@ -147,50 +151,50 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 //                        return false;
 //                    }
 //                }
-                    return false;
-                }
+                return false;
+            }
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return false;
-                }
-            });
-            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-                @Override
-                public boolean onClose() {
-                    UIUtil.hideKeyboard(getActivity());
-                    recyclerView.smoothScrollToPosition(0);
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                UIUtil.hideKeyboard(getActivity());
+                recyclerView.smoothScrollToPosition(0);
 
-                    toolbarTitle.setVisibility(View.VISIBLE);
-                    toolbarImage.setVisibility(View.VISIBLE);
-                    return false;
-                }
-            });
+                toolbarTitle.setVisibility(View.VISIBLE);
+                toolbarImage.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
 
 
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                doGroupCityCall();
+                //doSeparateCityCall();
+            }
+        });
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        int colorResourceName = getResources().getIdentifier("blue", "color", getActivity().getPackageName());
+        Toasty.Config.getInstance().setTextColor(ContextCompat.getColor(getActivity(), colorResourceName)).apply();
 
-            swipeRefreshLayout =view.findViewById(R.id.swipe_refresh_layout);
-            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    doGroupCityCall();
-                    //doSeparateCityCall();
-                }
-            });
-            layoutManager = new LinearLayoutManager(getActivity());
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setHasFixedSize(true);
-            int colorResourceName = getResources().getIdentifier("blue", "color", getActivity().getPackageName());
-            Toasty.Config.getInstance().setTextColor(ContextCompat.getColor(getActivity(), colorResourceName)).apply();
-
-            apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
-        }
+        apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
+    }
 
     private void initRecCityAdapter(List<WeatherList> dataList) {
-        adapter = new RecyclerCityAdapter(dataList);
+        adapter = new RecyclerCityAdapter(dataList, getActivity());
         adapter.setCityClickListener(cityClick);
         recyclerView.setAdapter(adapter);
     }
+
     private void doGroupCityCall() {
         loader.start();
         Call<Example> call = apiInterface.getCitysWeatherList();
@@ -218,10 +222,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
-                relativeLayoutForRecycle.setBackgroundColor(ContextCompat.getColor(getActivity(),R.color.rowBackground));
+                relativeLayoutForRecycle.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.rowBackground));
             }
         });
     }
+
     private void doSeparateCityCall(String cityName) {
         loader.start();
         final String[] tempature = {null};
@@ -235,9 +240,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 //                    Double temp = separateCity.getList().get(0).getMain().getTemp();
 //                    int tempInt = Integer.valueOf(temp.intValue());
 //                    tempature[0] = String.valueOf(tempInt);
-                    FragmentManager fragmentManager=getActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
-                    MainFragment.vidibility=false;
+                    MainFragment.vidibility = false;
                     transaction.replace(R.id.base_fragment_container, CityFragment.newInstance(separateCity.getList().get(0).getName()));
                     transaction.commit();
 
@@ -254,12 +259,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             }
 
 
-
             @Override
             public void onFailure(Call<SeparateCity> call, Throwable t) {
 //                Log.d("AAAA", t.toString());
                 //Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(),"Check your Internet Connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Check your Internet Connection", Toast.LENGTH_SHORT).show();
                 loader.end();
             }
         });
@@ -268,6 +272,14 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()) {
+            case R.id.slaq_button:
+if(CityFragment.CITY_NAME!=null){
+    doSeparateCityCall(CityFragment.CITY_NAME);
+    return;
+}
+Toast.makeText(getActivity(),"At first choose your favorite city for forecast",Toast.LENGTH_LONG).show();
+                break;
+        }
     }
 }
