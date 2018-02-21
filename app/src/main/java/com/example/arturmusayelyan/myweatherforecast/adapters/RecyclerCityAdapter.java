@@ -31,6 +31,8 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
    private Context context;
 
     public RecyclerCityAdapter(List<WeatherList> dataList,Context context) {
+        //setHasStableIds(true);
+
         this.dataList = dataList;
         this.context=context;
     }
@@ -42,11 +44,13 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
-        return new MyViewHolder(view);
+        MyViewHolder holder=new MyViewHolder(view);
+        //holder.setIsRecyclable(false);
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         WeatherList currentWeather = dataList.get(position);
 
         String currentWeatherName=currentWeather.getName();
@@ -55,7 +59,8 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
         }
         holder.cityTv.setText(currentWeatherName);
         holder.tempratureTv.setText((int)Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp()))+"º C");
-        Glide.with(context).load("http://openweathermap.org/img/w/"+currentWeather.getWeather().get(0).getIcon()+".png").listener(new RequestListener<Drawable>() {
+
+        Glide.with(context).load("http://openweathermap.org/img/w/"+dataList.get(holder.getAdapterPosition()).getWeather().get(0).getIcon()+".png").listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                 return false;
@@ -63,10 +68,14 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
             @Override
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//holder.weatherIcon.setImageDrawable(resource);
+                holder.weatherIcon.setImageDrawable(null);
                 return false;
             }
         }).into(holder.weatherIcon);
+
     }
+
 
     @Override
     public int getItemCount() {

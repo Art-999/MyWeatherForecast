@@ -153,6 +153,8 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                             return false;
                         }
                     }).into(tittleIcon);
+
+                    Log.d("Icon",separateCity.getList().get(0).getWeather().get(0).getIcon()+" fragment");
                    // tittleIcon.setImageDrawable(cityMainIcon.getDrawable());
                    // cityMainIcon.setImageDrawable(Glide.with(getActivity()).load(separateCity.getList().get(0).getWeather().get(0).getIcon()));
 

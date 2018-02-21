@@ -45,6 +45,8 @@ import retrofit2.Response;
  */
 
 public class MainFragment extends Fragment implements View.OnClickListener {
+    //public static boolean MAINFRAGMENT
+
     private RecyclerView recyclerView;
     private RecyclerCityAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;

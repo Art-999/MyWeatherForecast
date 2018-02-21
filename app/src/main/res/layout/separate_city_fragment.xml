@@ -62,35 +62,12 @@
                 android:id="@+id/city_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/left_arrow"
-                android:layout_alignTop="@id/left_arrow"
                 android:layout_below="@id/date_tame_tv"
-                android:layout_toLeftOf="@id/right_arrow"
-                android:layout_toRightOf="@id/left_arrow"
                 android:gravity="center"
                 android:text="Johanesburg"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/textSize" />
 
-            <ImageView
-                android:id="@+id/left_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/date_tame_tv"
-                android:padding="10dp"
-                android:src="@drawable/left_slaq"
-                android:visibility="invisible" />
-
-            <ImageView
-                android:id="@+id/right_arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/date_tame_tv"
-                android:padding="10dp"
-                android:src="@drawable/right_slaq"
-                android:visibility="invisible" />
 
             <RelativeLayout
                 android:id="@+id/city_main_icon_layout"
@@ -98,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/city_name"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/city_items_big_margin"
                 android:gravity="center_horizontal">
 
                 <ImageView

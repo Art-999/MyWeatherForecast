@@ -11,4 +11,5 @@
     <dimen name="arrow_view_height">28dp</dimen>
     <dimen name="row_item_icon_size">50dp</dimen>
     <dimen name="city_items_margin">10dp</dimen>
+    <dimen name="city_items_big_margin">20dp</dimen>
 </resources>

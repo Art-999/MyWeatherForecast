@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
     }
 
 
-    private void doSeparateCityCall(String cityName) {
+    public void doSeparateCityCall(String cityName) {
         loader.start();
         final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
