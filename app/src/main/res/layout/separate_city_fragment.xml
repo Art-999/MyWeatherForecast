@@ -10,42 +10,44 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/separate_city_toolbar"
+        <RelativeLayout
+            android:id="@+id/separate_city_title_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/red">
+            android:layout_height="@dimen/toolbar_height"
+            android:background="@color/separate_city_base_color"
+            android:gravity="center">
+
             <ImageView
                 android:id="@+id/toolbar_image_view"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:layout_margin="10dp"
-                android:layout_marginLeft="35dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
                 android:src="@drawable/cloud_3"
                 android:visibility="visible" />
 
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
+                android:layout_height="match_parent"
                 android:layout_toRightOf="@id/toolbar_image_view"
-                android:text="@string/app_name"
+                android:text="@string/toolbar_tittle"
                 android:textColor="@android:color/white"
-                android:textSize="20sp" />
+                android:textSize="@dimen/title_text_size"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="@dimen/toolbar_icon_text_margin"
+                android:layout_marginRight="@dimen/toolbar_icon_text_margin"
+                android:layout_toEndOf="@id/toolbar_image_view" />
 
 
-        </FrameLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/city_base_info_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@id/slaq_button"
-            android:layout_below="@id/separate_city_toolbar"
-            android:background="@color/red">
+            android:layout_below="@id/separate_city_title_layout"
+            android:background="@color/separate_city_base_color">
 
             <TextView
                 android:id="@+id/date_tame_tv"
@@ -54,7 +56,7 @@
                 android:gravity="center"
                 android:text="14/02/2018   15:57:01"
                 android:textColor="@android:color/white"
-                android:textSize="15sp" />
+                android:textSize="@dimen/textSize" />
 
             <TextView
                 android:id="@+id/city_name"
@@ -68,17 +70,17 @@
                 android:gravity="center"
                 android:text="Johanesburg"
                 android:textColor="@android:color/white"
-                android:textSize="18sp" />
+                android:textSize="@dimen/textSize" />
 
             <ImageView
                 android:id="@+id/left_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:visibility="invisible"
                 android:layout_below="@id/date_tame_tv"
                 android:padding="10dp"
-                android:src="@drawable/left_slaq" />
+                android:src="@drawable/left_slaq"
+                android:visibility="invisible" />
 
             <ImageView
                 android:id="@+id/right_arrow"
@@ -87,22 +89,23 @@
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/date_tame_tv"
                 android:padding="10dp"
-                android:visibility="invisible"
-                android:src="@drawable/right_slaq" />
+                android:src="@drawable/right_slaq"
+                android:visibility="invisible" />
 
             <RelativeLayout
-                android:layout_below="@id/city_name"
                 android:id="@+id/city_main_icon_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/city_name"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:gravity="center_horizontal"
-                android:layout_height="wrap_content">
+                android:gravity="center_horizontal">
+
                 <ImageView
                     android:id="@+id/city_main_icon"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-               android:src="@drawable/sun_separate_city_icon" />
+                    android:src="@drawable/sun_separate_city_icon" />
             </RelativeLayout>
 
 
@@ -115,7 +118,7 @@
                 android:padding="5dp"
                 android:text="clear sky"
                 android:textColor="@color/white"
-                android:textSize="15sp"
+                android:textSize="@dimen/textSize"
                 android:textStyle="italic" />
 
             <LinearLayout
@@ -152,7 +155,7 @@
                             android:gravity="center_vertical"
                             android:text="31°C"
                             android:textColor="@android:color/white"
-                            android:textSize="40sp"
+                            android:textSize="@dimen/big_text_size"
                             android:textStyle="bold" />
                     </RelativeLayout>
 
@@ -177,7 +180,7 @@
                             android:gravity="center_vertical"
                             android:text="0.3mph"
                             android:textColor="@android:color/white"
-                            android:textSize="20sp" />
+                            android:textSize="@dimen/textSize" />
 
                     </LinearLayout>
 
@@ -190,132 +193,64 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:weightSum="3">
+
                     <RelativeLayout
+                        android:layout_weight="3"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
+
                         <ImageView
                             android:id="@+id/humidity_icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/drop"
+                            android:layout_alignParentBottom="true"
                             android:layout_marginBottom="10dp"
                             android:layout_toLeftOf="@id/humidity_tv"
-                            android:layout_alignParentBottom="true"
-                            />
+                            android:src="@drawable/drop" />
 
                         <TextView
                             android:id="@+id/humidity_tv"
-                            android:text="0%"
-                            android:textSize="20sp"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginBottom="20dp"
-                            android:layout_marginTop="10dp"
-                            android:textColor="@android:color/white"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                             />
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginBottom="@dimen/city_items_margin"
+                            android:layout_marginLeft="@dimen/city_items_margin"
+                            android:layout_marginRight="@dimen/city_items_margin"
+                            android:layout_marginTop="@dimen/city_items_margin"
+                            android:text="0%"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/textSize" />
+
                         <TextView
                             android:id="@+id/temp_max_tv"
                             android:layout_width="wrap_content"
-                            android:textSize="20sp"
-                            android:textColor="@android:color/white"
-                            android:text="max: 48°C"
-                            android:layout_alignParentRight="true"
-                            android:layout_marginRight="10dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="2dp"
-                            android:layout_above="@id/temp_min_tv"
                             android:layout_height="wrap_content"
-                            />
+                            android:layout_above="@id/temp_min_tv"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginBottom="2dp"
+                            android:layout_marginLeft="@dimen/city_items_margin"
+                            android:layout_marginRight="@dimen/city_items_margin"
+                            android:layout_marginTop="@dimen/city_items_margin"
+                            android:text="max: 48°C"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/textSize" />
+
                         <TextView
                             android:id="@+id/temp_min_tv"
                             android:layout_width="wrap_content"
-                            android:textSize="20sp"
-                           android:layout_above="@id/humidity_tv"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginRight="10dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="2dp"
-                            android:layout_alignParentRight="true"
-                            android:textColor="@android:color/white"
-                            android:text="min: 18°C"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"/>
-
-
+                            android:layout_above="@id/humidity_tv"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginBottom="@dimen/city_items_margin"
+                            android:layout_marginLeft="@dimen/city_items_margin"
+                            android:layout_marginRight="@dimen/city_items_margin"
+                            android:layout_marginTop="2dp"
+                            android:layout_weight="1"
+                            android:text="min: 18°C"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/textSize" />
                     </RelativeLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:layout_weight="1">
-                        <!--<ImageView-->
-                            <!--android:layout_width="0dp"-->
-                            <!--android:layout_height="50dp"-->
-                            <!--android:layout_weight="1"-->
-                            <!--android:src=""/>-->
-                        <!--<TextView-->
-                            <!--android:id="@+id/temp_max_tv"-->
-                            <!--android:layout_width="0dp"-->
-                            <!--android:textSize="20sp"-->
-                            <!--android:gravity="bottom|center_horizontal"-->
-                            <!--android:textColor="@android:color/white"-->
-                            <!--android:text="max: 48°C"-->
-                            <!--android:layout_marginLeft="50dp"-->
-                            <!--android:layout_height="match_parent"-->
-                            <!--android:layout_weight="1"/>-->
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1">
-                        <!--<TextView-->
-                            <!--android:id="@+id/temp_min_tv"-->
-                            <!--android:layout_width="0dp"-->
-                            <!--android:textSize="20sp"-->
-                            <!--android:layout_marginLeft="50dp"-->
-                            <!--android:gravity="bottom|center_horizontal"-->
-                            <!--android:textColor="@android:color/white"-->
-                            <!--android:text="min: 18°C"-->
-                            <!--android:layout_height="match_parent"-->
-                            <!--android:layout_weight="1"/>-->
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/humidity_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:layout_gravity="center_horizontal"
-                        android:orientation="horizontal">
-
-                        <!--<ImageView-->
-                            <!--android:layout_width="0dp"-->
-                            <!--android:layout_height="match_parent"-->
-                            <!--android:layout_weight="1"-->
-                            <!--android:gravity="center"-->
-                            <!--android:src="@drawable/drop"-->
-                            <!--android:layout_marginRight="5dp"-->
-                            <!--android:layout_marginLeft="80dp"/>-->
-
-                        <!--<TextView-->
-                            <!--android:id="@+id/humidity_tv"-->
-                            <!--android:text="0%"-->
-                            <!--android:textSize="20sp"-->
-                            <!--android:gravity="center_vertical"-->
-                            <!--android:textColor="@android:color/white"-->
-                            <!--android:layout_width="0dp"-->
-                            <!--android:layout_height="match_parent"-->
-                            <!--android:layout_weight="2" />-->
-                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -323,17 +258,24 @@
 
 
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/separate_line_bottom"
+            android:layout_above="@id/slaq_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <include layout="@layout/separate_line_layout" />
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/slaq_button"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:clickable="true"
+            android:layout_height="@dimen/arrow_view_height"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:background="#990000"
-            android:src="@drawable/up_slaq"
-            android:focusable="true" />
+            android:background="@color/bottom_arrow_color"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/up_slaq" />
 
         <com.example.arturmusayelyan.myweatherforecast.views.Loader
             android:id="@+id/custom_loader"

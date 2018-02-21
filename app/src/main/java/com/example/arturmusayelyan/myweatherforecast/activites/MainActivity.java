@@ -1,6 +1,7 @@
 package com.example.arturmusayelyan.myweatherforecast.activites;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -90,36 +91,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 
     @Override
     public void cityClick(String cityName) {
-        //     Gson gson = new Gson();
-
-//        Toast toast = Toasty.normal(this, "   " + weatherList.getName() + "   ");
-//        toast.setGravity(Gravity.CENTER, 0, 0);
-//        toast.show();
-//        Intent intent = new Intent(this, WeatherActivity.class);
-//        intent.putExtra(KEY_CITY, gson.toJson(city));
-//        startActivity(intent);
-        //   Toast.makeText(this, weatherList.getName(), Toast.LENGTH_SHORT).show();
         addSeparateCityFragment(cityName);
     }
 
     public void addSeparateCityFragment(String cityName) {
-        fragmentManager=getSupportFragmentManager();
-        cityFragment=CityFragment.newInstance(cityName);
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        MainFragment.vidibility = false;
-
-        transaction.add(R.id.base_fragment_container, CityFragment.newInstance(cityName));
-        transaction.commit();
+//        fragmentManager=getSupportFragmentManager();
+//        cityFragment=CityFragment.newInstance(cityName);
+//        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//        MainFragment.vidibility = false;
+//
+//        transaction.add(R.id.base_fragment_container, CityFragment.newInstance(cityName));
+//        transaction.commit();
+        pushFragment(CityFragment.newInstance(cityName),false);
     }
     public void addMainFragment(){
-        fragmentManager = getSupportFragmentManager();
-        mainFragment = MainFragment.newInstance();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.base_fragment_container, mainFragment, "mainFragment");
-        MainFragment.vidibility = true;
-
-       // transaction.addToBackStack(null);
-        transaction.commit();
+//        fragmentManager = getSupportFragmentManager();
+//        mainFragment = MainFragment.newInstance();
+//        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//        transaction.add(R.id.base_fragment_container, mainFragment, "mainFragment");
+//        MainFragment.vidibility = true;
+//
+//       // transaction.addToBackStack(null);
+//        transaction.commit();
+        pushFragment(MainFragment.newInstance(),true);
     }
 
     @Override
@@ -147,10 +141,35 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 //        if(mainFragment!=null && mainFragment.isVisible()){
 //            super.onBackPressed();
 //        }
-        if(mainFragment!=null && cityFragment.isVisible()){
-            addMainFragment();
-        }
+//        if(mainFragment!=null && cityFragment.isVisible()){
+//            addMainFragment();
+//        }
+        backToHomeScreen();
         super.onBackPressed();
+    }
+
+    public void pushFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        if (addToBackStack) {
+            transaction.add(R.id.base_fragment_container, fragment);
+            transaction.addToBackStack(fragment.getClass().getSimpleName());
+        } else {
+            transaction.replace(R.id.base_fragment_container, fragment);
+        }
+
+        transaction.commit();
+    }
+
+    public void backToHomeScreen(){
+        FragmentManager fragmentManager=getSupportFragmentManager();
+        int backStackCount=getSupportFragmentManager().getBackStackEntryCount();
+        for (int i = 0; i <backStackCount ; i++) {
+            int backStackFragmentId=fragmentManager.getBackStackEntryAt(i).getId();
+
+            fragmentManager.popBackStack(backStackFragmentId,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
     }
 
     private void init() {
@@ -161,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerCityClick
 //        includeProgressView.setVisibility(View.VISIBLE);
         toolbarTitle = findViewById(R.id.toolbar_title);
         toolbarImage = findViewById(R.id.toolbar_image_view);
-        searchIncludeLayout = findViewById(R.id.search_include_layout);
+       // searchIncludeLayout = findViewById(R.id.search_include_layout);
 
         searchView = findViewById(R.id.search_view);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);

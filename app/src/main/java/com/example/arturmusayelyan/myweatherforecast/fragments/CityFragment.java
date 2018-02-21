@@ -2,7 +2,6 @@ package com.example.arturmusayelyan.myweatherforecast.fragments;
 
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -44,7 +43,7 @@ import retrofit2.Response;
 
 public class CityFragment extends Fragment implements View.OnClickListener {
     private TextView dateTimeTV, cityNameTv, weatherDescTv, temperatureTv, windSpeedTv, humidityTv, tempMaxTv, tempMinTv;
-    private ImageView slaqButton,cityMainIcon;
+    private ImageView slaqButton,cityMainIcon,tittleIcon;
     private String cityName;
     private ApiInterface apiInterface;
     private Loader loader;
@@ -95,6 +94,7 @@ public class CityFragment extends Fragment implements View.OnClickListener {
     private void init(View view) {
         dateTimeTV = view.findViewById(R.id.date_tame_tv);
         cityNameTv = view.findViewById(R.id.city_name);
+        tittleIcon=view.findViewById(R.id.toolbar_image_view);
         temperatureTv = view.findViewById(R.id.temperature_tv);
         weatherDescTv = view.findViewById(R.id.weather_description_tv);
         humidityTv = view.findViewById(R.id.humidity_tv);
@@ -149,9 +149,11 @@ public class CityFragment extends Fragment implements View.OnClickListener {
 
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
                             return false;
                         }
-                    }).into(cityMainIcon);
+                    }).into(tittleIcon);
+                   // tittleIcon.setImageDrawable(cityMainIcon.getDrawable());
                    // cityMainIcon.setImageDrawable(Glide.with(getActivity()).load(separateCity.getList().get(0).getWeather().get(0).getIcon()));
 
                 }

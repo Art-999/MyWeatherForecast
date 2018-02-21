@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
-import com.example.arturmusayelyan.myweatherforecast.models.City;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
@@ -46,23 +45,16 @@ import retrofit2.Response;
  */
 
 public class MainFragment extends Fragment implements View.OnClickListener {
-    public static boolean vidibility;
     private RecyclerView recyclerView;
     private RecyclerCityAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ApiInterface apiInterface;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private List<City> citysList;
-    private View includeProgressView;
     private SearchView searchView;
     private List<WeatherList> dataList;
-    private String localJsonString;
-
     private TextView toolbarTitle;
     private ImageView toolbarImage;
-    private RelativeLayout searchIncludeLayout;
     private RelativeLayout relativeLayoutForRecycle;
-
     private Loader loader;
     private RecyclerCityClick cityClick;
     private ImageView slaqButton;
@@ -98,18 +90,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         loader = view.findViewById(R.id.custom_loader);
         slaqButton = view.findViewById(R.id.slaq_button);
         slaqButton.setOnClickListener(this);
-//        includeProgressView = findViewById(R.id.progress_layout);
-//        includeProgressView.setVisibility(View.VISIBLE);
         toolbarTitle = view.findViewById(R.id.toolbar_title);
         toolbarImage = view.findViewById(R.id.toolbar_image_view);
-        searchIncludeLayout = view.findViewById(R.id.search_include_layout);
 
         searchView = view.findViewById(R.id.search_view);
         EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(R.color.white));
         searchEditText.setHint(getResources().getString(R.string.search_hint));
         searchEditText.setHintTextColor(getResources().getColor(R.color.yellow));
-        searchEditText.setBackgroundColor(getResources().getColor(R.color.light_blue));
+        //   searchEditText.setBackgroundColor(getResources().getColor(R.color.light_blue));
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,14 +211,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
-                relativeLayoutForRecycle.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.rowBackground));
             }
         });
     }
 
     private void doSeparateCityCall(String cityName) {
         loader.start();
-        final String[] tempature = {null};
+ //       final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
         call.enqueue(new Callback<SeparateCity>() {
             @Override
@@ -242,19 +230,14 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 //                    tempature[0] = String.valueOf(tempInt);
                     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
-                    MainFragment.vidibility = false;
+
                     transaction.replace(R.id.base_fragment_container, CityFragment.newInstance(separateCity.getList().get(0).getName()));
                     transaction.commit();
 
                     return;
                 }
 
-//                if(tempature[0]!=null){
-//                    loader.end();
-//                    Toast.makeText(getActivity(), tempature[0], Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                Toast.makeText(getActivity(), "Type city name in correct", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
                 loader.end();
             }
 
@@ -263,7 +246,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             public void onFailure(Call<SeparateCity> call, Throwable t) {
 //                Log.d("AAAA", t.toString());
                 //Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(), "Check your Internet Connection", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
                 loader.end();
             }
         });
@@ -274,11 +257,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-if(CityFragment.CITY_NAME!=null){
-    doSeparateCityCall(CityFragment.CITY_NAME);
-    return;
-}
-Toast.makeText(getActivity(),"At first choose your favorite city for forecast",Toast.LENGTH_LONG).show();
+                if (CityFragment.CITY_NAME != null) {
+                    doSeparateCityCall(CityFragment.CITY_NAME);
+                    return;
+                }
+                Toast.makeText(getActivity(), "At first choose your favorite city for forecast", Toast.LENGTH_LONG).show();
                 break;
         }
     }
