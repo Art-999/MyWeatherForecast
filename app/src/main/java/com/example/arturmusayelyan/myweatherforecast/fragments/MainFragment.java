@@ -44,7 +44,7 @@ import retrofit2.Response;
  * Created by artur.musayelyan on 20/02/2018.
  */
 
-public class MainFragment extends Fragment implements View.OnClickListener {
+public class MainFragment extends Fragment implements View.OnClickListener,RecyclerCityClick {
     //public static boolean MAINFRAGMENT
 
     private RecyclerView recyclerView;
@@ -83,7 +83,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         init(view);
         doGroupCityCall();
-        cityClick = (RecyclerCityClick) getActivity();
+       // cityClick = (RecyclerCityClick) getActivity();
     }
 
     private void init(View view) {
@@ -142,6 +142,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 //                        return false;
 //                    }
 //                }
+                searchView.onActionViewCollapsed();
                 return false;
             }
 
@@ -217,7 +218,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void doSeparateCityCall(String cityName) {
+    private void doSeparateCityCall(final String cityName) {
         loader.start();
  //       final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
@@ -227,19 +228,19 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 //Log.d("Weather",response.body()+"");
                 SeparateCity separateCity = response.body();
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
-//                    Double temp = separateCity.getList().get(0).getMain().getTemp();
-//                    int tempInt = Integer.valueOf(temp.intValue());
-//                    tempature[0] = String.valueOf(tempInt);
+
+                    CityFragment fragment=CityFragment.newInstance(cityName);
                     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-                    transaction.replace(R.id.base_fragment_container, CityFragment.newInstance(separateCity.getList().get(0).getName()));
+                    transaction.replace(R.id.base_fragment_container, fragment);
+                    transaction.addToBackStack(fragment.getClass().getSimpleName());
                     transaction.commit();
-
                     return;
                 }
 
                 Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
+                toolbarImage.setVisibility(View.VISIBLE);
+                toolbarTitle.setVisibility(View.VISIBLE);
                 loader.end();
             }
 
@@ -266,5 +267,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getActivity(), "At first choose your favorite city for forecast", Toast.LENGTH_LONG).show();
                 break;
         }
+    }
+
+    @Override
+    public void cityClick(WeatherList weatherList, boolean checkBoxClicked) {
+       if(checkBoxClicked){
+
+       }
+       else {
+           doSeparateCityCall(weatherList.getName());
+       }
     }
 }

@@ -38,6 +38,33 @@ public class WeatherList {
     @SerializedName("name")
     @Expose
     private String name;
+    private boolean checked;
+    private String icon;
+    private int position;
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
 
     public Coord getCoord() {
         return coord;

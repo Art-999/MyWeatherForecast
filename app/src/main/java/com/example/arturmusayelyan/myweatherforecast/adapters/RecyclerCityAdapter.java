@@ -5,14 +5,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
+import com.example.arturmusayelyan.myweatherforecast.models.CustomCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
-import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,13 +25,14 @@ import java.util.List;
 public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapter.MyViewHolder> {
     private List<WeatherList> dataList;
     private RecyclerCityClick recyclerCityClick;
-   private Context context;
+    private Context context;
+    private ArrayList<CustomCity> customCitiesList = new ArrayList<>();
 
-    public RecyclerCityAdapter(List<WeatherList> dataList,Context context) {
+    public RecyclerCityAdapter(List<WeatherList> dataList, Context context) {
         //setHasStableIds(true);
 
         this.dataList = dataList;
-        this.context=context;
+        this.context = context;
     }
 
     public void setCityClickListener(RecyclerCityClick cityClick) {
@@ -38,7 +42,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
-        MyViewHolder holder=new MyViewHolder(view);
+        MyViewHolder holder = new MyViewHolder(view);
         //holder.setIsRecyclable(false);
         return holder;
     }
@@ -47,18 +51,18 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         WeatherList currentWeather = dataList.get(position);
 
-        String currentWeatherName=currentWeather.getName();
-        if(currentWeatherName.length()>10){
+        String currentCityName = currentWeather.getName();
+        if (currentCityName.length() > 10) {
             holder.cityTv.setTextSize(16);
         }
-        holder.cityTv.setText(currentWeatherName);
-        holder.tempratureTv.setText((int)Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp()))+"º C");
+        holder.cityTv.setText(currentCityName);
+        holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
 
-        holder.weatherIcon.setImageDrawable(null);
 
-       // Glide.with(context).load("http://openweathermap.org/img/w/"+dataList.get(holder.getAdapterPosition()).getWeather().get(0).getIcon()+".png").into(holder.weatherIcon);
-        holder.weatherIcon.setImageDrawable(null);
-        Picasso.with(context).load("http://openweathermap.org/img/w/"+dataList.get(holder.getAdapterPosition()).getWeather().get(0).getIcon()+".png").into(holder.weatherIcon);
+        // Glide.with(context).load("http://openweathermap.org/img/w/"+dataList.get(holder.getAdapterPosition()).getWeather().get(0).getIcon()+".png").into(holder.weatherIcon);
+       // holder.weatherIcon.setImageDrawable(null);
+
+      //  holder.weatherIcon.setImageDrawable(null);
 //                listener(new RequestListener<Drawable>() {
 //            @Override
 //            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -73,7 +77,32 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 //            }
 //        }).into(holder.weatherIcon);
 
+//        if (customCitiesList != null && customCitiesList.size() >=0) {
+//            //holder.checkBox.setChecked(true);
+//            addChecks(holder.checkBox, currentCityName);
+//        }
+        String icon=dataList.get(position).getWeather().get(0).getIcon();
+
+            downloadImage(icon,position,holder.weatherIcon,currentWeather);
+
+//if(currentWeather.)
+
+
+      if(dataList.get(position).isChecked()){
+          holder.checkBox.setChecked(true);
+      }
+      else {
+          holder.checkBox.setChecked(false);
+      }
     }
+    private void downloadImage(String icon,int position,ImageView weatherIcon,WeatherList weatherList){
+        Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
+        weatherList.setIcon(icon);
+        weatherList.setPosition(position);
+        //notifyItemInserted(position);
+    }
+
+
 
 
     @Override
@@ -85,19 +114,59 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView cityTv, tempratureTv;
         private ImageView weatherIcon;
+        private CheckBox checkBox;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             cityTv = itemView.findViewById(R.id.row_city_tv);
             tempratureTv = itemView.findViewById(R.id.row_temp_tv);
             weatherIcon = itemView.findViewById(R.id.row_city_image);
-            itemView.setOnClickListener(this);
+            checkBox = itemView.findViewById(R.id.custom_check_box);
+            cityTv.setOnClickListener(this);
+            tempratureTv.setOnClickListener(this);
+            weatherIcon.setOnClickListener(this);
+            checkBox.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             //recyclerCityClick.cityClick(cityTv.getText().toString());
-            recyclerCityClick.cityClick(dataList.get(getAdapterPosition()).getName());
+            String cityName = dataList.get(getAdapterPosition()).getName();
+            if ((v.getId() == R.id.row_city_tv) || (v.getId() == R.id.row_temp_tv) || (v.getId() == R.id.row_city_image)) {
+                recyclerCityClick.cityClick(dataList.get(getAdapterPosition()),false);
+            } else if (v.getId() == R.id.custom_check_box) {
+                CheckBox currentCheckBox = (CheckBox) v;
+//                if (!currentCheckBox.isChecked()) {
+                   // Toast.makeText(context, cityName + " removed from favorite list", Toast.LENGTH_SHORT).show();
+//                    if (customCitiesList != null && customCitiesList.size() > 0) {
+//                        for (int i = 0; i < customCitiesList.size(); i++) {
+//                            if (customCitiesList.get(i).getName().equals(cityName)) {
+//                                customCitiesList.remove(i);
+//                                customCitiesList.add(new CustomCity(cityName, false));
+//
+//                                dataList.get(getAdapterPosition()).setChecked(false);
+//                                return;
+//                            }
+//                        }
+//                    }
+                    recyclerCityClick.cityClick(dataList.get(getAdapterPosition()),true);
+//                } else {
+                   // Toast.makeText(context, cityName + " added to favorite list", Toast.LENGTH_SHORT).show();
+//                    if (customCitiesList != null && customCitiesList.size() > 0) {
+//                        for (int i = 0; i < customCitiesList.size(); i++) {
+//                            if (customCitiesList.get(i).getName().equals(cityName)) {
+//                                customCitiesList.remove(i);
+//                                customCitiesList.add(new CustomCity(cityName, true));
+//
+//                                dataList.get(getAdapterPosition()).setChecked(true);
+//                                return;
+//                            }
+//                        }
+//                    }
+ //               }
+            }
         }
+
+
     }
 }
