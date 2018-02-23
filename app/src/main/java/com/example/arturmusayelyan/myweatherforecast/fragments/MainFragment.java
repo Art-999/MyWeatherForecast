@@ -1,11 +1,10 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,12 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.RecyclerCityClick;
+import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
@@ -33,6 +32,7 @@ import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -44,7 +44,7 @@ import retrofit2.Response;
  * Created by artur.musayelyan on 20/02/2018.
  */
 
-public class MainFragment extends Fragment implements View.OnClickListener,RecyclerCityClick {
+public class MainFragment extends Fragment implements View.OnClickListener, RecyclerItemClickListener {
     //public static boolean MAINFRAGMENT
 
     private RecyclerView recyclerView;
@@ -56,10 +56,11 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
     private List<WeatherList> dataList;
     private TextView toolbarTitle;
     private ImageView toolbarImage;
-    private RelativeLayout relativeLayoutForRecycle;
     private Loader loader;
-    private RecyclerCityClick cityClick;
+    private RecyclerItemClickListener itemClickListener;
     private ImageView slaqButton;
+    private Context context;
+    private ArrayList<String> selectedItemsList= new ArrayList<>();
 
     public MainFragment() {
 
@@ -81,13 +82,15 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        context = getActivity();
+        //itemClickListener = (RecyclerItemClickListener) context;
         init(view);
         doGroupCityCall();
-       // cityClick = (RecyclerCityClick) getActivity();
+        // onItemClick = (RecyclerItemClickListener) getActivity();
+
     }
 
     private void init(View view) {
-        relativeLayoutForRecycle = view.findViewById(R.id.relative_for_recycle);
         recyclerView = view.findViewById(R.id.recycler_view);
         loader = view.findViewById(R.id.custom_loader);
         slaqButton = view.findViewById(R.id.slaq_button);
@@ -106,7 +109,6 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
             public void onClick(View v) {
                 toolbarTitle.setVisibility(View.GONE);
                 toolbarImage.setVisibility(View.GONE);
-
             }
         });
 
@@ -168,8 +170,13 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                doGroupCityCall();
-                //doSeparateCityCall();
+               // doGroupCityCall();
+                adapter.notifyItemRangeChanged(0,dataList.size());
+
+                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+                Log.d("SelectedItems",selectedItemsList.toString());
             }
         });
         layoutManager = new LinearLayoutManager(getActivity());
@@ -182,8 +189,8 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
     }
 
     private void initRecCityAdapter(List<WeatherList> dataList) {
-        adapter = new RecyclerCityAdapter(dataList, getActivity());
-        adapter.setCityClickListener(cityClick);
+        adapter = new RecyclerCityAdapter(dataList, getActivity(),selectedItemsList);
+        adapter.setRecyclerItemClickListener(this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -220,7 +227,7 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
 
     private void doSeparateCityCall(final String cityName) {
         loader.start();
- //       final String[] tempature = {null};
+        //       final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
         call.enqueue(new Callback<SeparateCity>() {
             @Override
@@ -229,12 +236,7 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
                 SeparateCity separateCity = response.body();
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
 
-                    CityFragment fragment=CityFragment.newInstance(cityName);
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction transaction = fragmentManager.beginTransaction();
-                    transaction.replace(R.id.base_fragment_container, fragment);
-                    transaction.addToBackStack(fragment.getClass().getSimpleName());
-                    transaction.commit();
+                    ((MainActivity)getActivity()).pushFragment(CityFragment.newInstance(cityName),true);
                     return;
                 }
 
@@ -260,22 +262,23 @@ public class MainFragment extends Fragment implements View.OnClickListener,Recyc
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-                if (CityFragment.CITY_NAME != null) {
-                    doSeparateCityCall(CityFragment.CITY_NAME);
-                    return;
-                }
-                Toast.makeText(getActivity(), "At first choose your favorite city for forecast", Toast.LENGTH_LONG).show();
+                ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
                 break;
         }
     }
 
     @Override
-    public void cityClick(WeatherList weatherList, boolean checkBoxClicked) {
-       if(checkBoxClicked){
+    public void onItemClick(View view, WeatherList weatherList, int position) {
+        //doSeparateCityCall(weatherList.getName());
+        switch (view.getId()) {
+            case R.id.custom_check_box:
+               // dataList.get(position).setChecked(weatherList.isChecked());
+                selectedItemsList.add(String.valueOf(position));
+                break;
+            default:
+                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true);
+                break;
+        }
 
-       }
-       else {
-           doSeparateCityCall(weatherList.getName());
-       }
     }
 }

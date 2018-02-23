@@ -57,8 +57,7 @@ public class MainActivity extends AppCompatActivity  {
 //        init();
 //        doGroupCityCall();
 
-
-        addMainFragment();
+        pushFragment(MainFragment.newInstance(),false);
     }
 
 
