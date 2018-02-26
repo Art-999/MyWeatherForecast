@@ -252,27 +252,11 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
 
     //doGroupCitiesCallByCustomNames();
                 Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
-doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY());
+                ((MainActivity)getActivity()).pushFragment(FavoritesFragment.newInstance(),true);
                 break;
         }
     }
-    private void doGroupCitiesCallByCustomNames(String query){
-        loader.start();
 
-        Call<Example> call=apiInterface.getFavoriteCitesWeatherList(query);
-        call.enqueue(new Callback<Example>() {
-            @Override
-            public void onResponse(Call<Example> call, Response<Example> response) {
-                Log.d("Art",response.body().getList().toString());
-
-            }
-
-            @Override
-            public void onFailure(Call<Example> call, Throwable t) {
-
-            }
-        });
-    }
 
 
     @Override

@@ -41,11 +41,11 @@ public class FavoritesController {
 
     public String nameToCitesIdQUERY(){
         if(favoriteCitesIdList!=null){
-            StringBuilder builder=null;
+            StringBuilder builder=new StringBuilder();
             for (int i = 0; i <favoriteCitesIdList.size() ; i++) {
-                builder=builder.append(favoriteCitesIdList);
+                builder.append(favoriteCitesIdList.get(i));
                 if(i!=(favoriteCitesIdList.size()-1)){
-                    builder=builder.append(",");
+                    builder.append(",");
                 }
             }
             return new String(builder);
