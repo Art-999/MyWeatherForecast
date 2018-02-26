@@ -252,7 +252,12 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
 
     //doGroupCitiesCallByCustomNames();
                 Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
-                ((MainActivity)getActivity()).pushFragment(FavoritesFragment.newInstance(),true);
+if(FavoritesController.getInstance().favoriteSitesIdListInfo()!=null) {
+    ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
+}
+else {
+    Toast.makeText(getActivity(),R.string.empty_favorites,Toast.LENGTH_SHORT).show();
+}
                 break;
         }
     }

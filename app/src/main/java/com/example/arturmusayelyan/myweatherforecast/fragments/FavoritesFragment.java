@@ -93,29 +93,27 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
             @Override
             public void onRefresh() {
                 // doGroupCityCall();
-                loader.start();
+                doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY());
                 adapter.notifyItemRangeChanged(0, favoriteCitiesList.size());
-                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    loader.end();
-                }
+
+//                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    loader.end();
+//                }
             }
         });
     }
 
-    private void doGroupCityCall() {
+
+    private void doGroupCitiesCallByCustomNames(String query) {
         loader.start();
-        Call<Example> call = apiInterface.getCitysWeatherList();
+
+        Call<Example> call = apiInterface.getFavoriteCitesWeatherList(query);
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
-                //  Log.d("Artur", response.body().toString());
-
-                favoriteCitiesList = (ArrayList<WeatherList>) response.body().getList();
-                if (favoriteCitiesList != null && !favoriteCitiesList.isEmpty()) {
-
-                    initFavoriteCitesAdapter(favoriteCitiesList);
-                }
+                Log.d("Art", response.body().getList().toString());
+                initFavoriteCitesAdapter((ArrayList<WeatherList>) response.body().getList());
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
@@ -131,24 +129,6 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
-            }
-        });
-    }
-
-    private void doGroupCitiesCallByCustomNames(String query) {
-        loader.start();
-
-        Call<Example> call = apiInterface.getFavoriteCitesWeatherList(query);
-        call.enqueue(new Callback<Example>() {
-            @Override
-            public void onResponse(Call<Example> call, Response<Example> response) {
-                Log.d("Art", response.body().getList().toString());
-                initFavoriteCitesAdapter((ArrayList<WeatherList>) response.body().getList());
-                loader.end();
-            }
-
-            @Override
-            public void onFailure(Call<Example> call, Throwable t) {
 
             }
         });
