@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class FavoritesController {
-    private static FavoritesController favoritesController=new FavoritesController();
+    private static FavoritesController instance = null;
     private ArrayList<String> favoriteCitesIdList;
     private ArrayList<String> favoriteCitesNameList;
 
@@ -15,8 +15,15 @@ public class FavoritesController {
 
     }
 
+    public static void setInstance(FavoritesController instance) {
+        FavoritesController.instance = instance;
+    }
+
     public static FavoritesController getInstance() {
-        return favoritesController;
+        if (instance == null) {
+            instance = new FavoritesController();
+        }
+        return instance;
     }
 
     public void addID(String ID) {
@@ -31,6 +38,11 @@ public class FavoritesController {
             favoriteCitesIdList.remove(ID);
         }
     }
+    public void removeIDsIndex(int position){
+        if(favoriteCitesIdList!=null){
+            favoriteCitesIdList.remove(position);
+        }
+    }
 
     public String favoriteSitesIdListInfo() {
         if (favoriteCitesIdList != null) {
@@ -39,18 +51,19 @@ public class FavoritesController {
         return null;
     }
 
-    public String nameToCitesIdQUERY(){
-        if(favoriteCitesIdList!=null){
-            StringBuilder builder=new StringBuilder();
-            for (int i = 0; i <favoriteCitesIdList.size() ; i++) {
+    public ArrayList<String> getFavoriteCitesIdList() {
+        return favoriteCitesIdList;
+    }
+
+    public String nameToCitesIdQUERY() {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < favoriteCitesIdList.size(); i++) {
                 builder.append(favoriteCitesIdList.get(i));
-                if(i!=(favoriteCitesIdList.size()-1)){
+                if (i != (favoriteCitesIdList.size() - 1)) {
                     builder.append(",");
                 }
             }
             return new String(builder);
-        }
-        return null;
     }
 
     private void addName(String name) {

@@ -60,9 +60,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     private ImageView slaqButton;
 
     private int k;
-    private ArrayList<WeatherList> favoriteDataList;
-    private ArrayList<String> favoritecitesIDList;
-
 
     public MainFragment() {
 
@@ -85,9 +82,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init(view);
-        doGroupCityCall();
-
-        favoriteDataList=new ArrayList<>();
+        doGroupCityCall(true);
     }
 
     private void init(View view) {
@@ -145,14 +140,14 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-               // doGroupCityCall();
+                // doGroupCityCall();
                 loader.start();
-                adapter.notifyItemRangeChanged(0,dataList.size());
+                doGroupCityCall(false);
 
-                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    loader.end();
-                }
+//                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    loader.end();
+//                }
             }
         });
         layoutManager = new LinearLayoutManager(getActivity());
@@ -170,17 +165,21 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         recyclerView.setAdapter(adapter);
     }
 
-    private void doGroupCityCall() {
+    private void doGroupCityCall(final boolean fistTime) {
         loader.start();
         Call<Example> call = apiInterface.getCitysWeatherList();
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
-              //  Log.d("Artur", response.body().toString());
+                //  Log.d("Artur", response.body().toString());
 
                 dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
-                    initRecCityAdapter(dataList);
+                    if (fistTime) {
+                        initRecCityAdapter(dataList);
+                    } else {
+                        adapter.notifyItemRangeChanged(0, dataList.size());
+                    }
                 }
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
@@ -212,7 +211,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 SeparateCity separateCity = response.body();
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
 
-                    ((MainActivity)getActivity()).pushFragment(CityFragment.newInstance(cityName),true);
+                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(cityName), true);
                     return;
                 }
 
@@ -238,57 +237,37 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-//                ArrayList<String> favoriteCitiesName=new ArrayList<>();
-//                    for (int i = 0; i < favoriteDataList.size(); i++) {
-//                        favoriteCitiesName.add(favoriteDataList.get(i).getName());
-//                    }
-//                    if(favoriteCitiesName.size()>0){
-//                        ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(favoriteCitiesName), true);
-//                        Log.d("Art", favoriteDataList.size() + "");
-//                    }
-//                    else {
-//                        Toast.makeText(getActivity(),R.string.empty_favorites,Toast.LENGTH_SHORT).show();
-//              }
+                //doGroupCitiesCallByCustomNames();
+                // Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                if (FavoritesController.getInstance() != null) {
+                    if (FavoritesController.getInstance().getFavoriteCitesIdList().size() > 0) {
+                        ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
+                        return;
+                    }
+                }
 
-    //doGroupCitiesCallByCustomNames();
-                Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
-if(FavoritesController.getInstance().favoriteSitesIdListInfo()!=null) {
-    ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
-}
-else {
-    Toast.makeText(getActivity(),R.string.empty_favorites,Toast.LENGTH_SHORT).show();
-}
+                    Toast.makeText(getActivity(), R.string.empty_favorites, Toast.LENGTH_SHORT).show();
                 break;
         }
     }
-
 
 
     @Override
     public void onItemClick(View view, WeatherList weatherList, int position) {
         switch (view.getId()) {
             case R.id.custom_check_box:
-                if(weatherList.isChecked()){
-                   k++;
-                    Log.d("Art",k+"");
-
-//                    weatherList.setPosition(position);
-//                    weatherList.setChecked(true);
-//                    favoriteDataList.add(weatherList);
+                if (weatherList.isChecked()) {
+                    k++;
+                    Log.d("Art", k + "");
 
                     FavoritesController.getInstance().addID(String.valueOf(weatherList.getId()));
-                    Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
-                }
-                else {
+                    Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                } else {
                     k--;
-                    Log.d("Art",k+"");
-
-//                    weatherList.setPosition(position);
-//                    weatherList.setChecked(false);
-//                    favoriteDataList.remove(weatherList);
+                    Log.d("Art", k + "");
 
                     FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
-                    Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
+                    Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
                 }
 
                 break;

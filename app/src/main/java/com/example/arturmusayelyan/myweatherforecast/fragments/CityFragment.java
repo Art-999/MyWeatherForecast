@@ -23,6 +23,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
@@ -42,13 +43,13 @@ import retrofit2.Response;
 
 public class CityFragment extends Fragment implements View.OnClickListener {
     private final String CLEAR_SKY = "Clear";
-    private final String CLOUDS="Clouds";
+    private final String CLOUDS = "Clouds";
     private final String RAIN = "Rain";
     private final String THUNDERSTORM = "Thunderstorm";
     private final String SNOW = "Snow";
     private final String MIST = "Mist";
-    private final String HAZE="Haze";
-    private final String Drizzle="Drizzle";
+    private final String HAZE = "Haze";
+    private final String Drizzle = "Drizzle";
 
     private TextView dateTimeTV, cityNameTv, weatherDescTv, temperatureTv, windSpeedTv, humidityTv, tempMaxTv, tempMinTv;
     private ImageView slaqButton, cityMainIcon, tittleIcon;
@@ -140,10 +141,10 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                     int tempInt = Integer.valueOf(temp.intValue());
                     tempature[0] = String.valueOf(tempInt);
 
-                    String weatherDescription=separateCity.getList().get(0).getWeather().get(0).getDescription();
-                    String weatherMainDescription=separateCity.getList().get(0).getWeather().get(0).getMain();
-                    Log.d("Description",weatherDescription);
-                    Log.d("mainDescription",weatherMainDescription);
+                    String weatherDescription = separateCity.getList().get(0).getWeather().get(0).getDescription();
+                    String weatherMainDescription = separateCity.getList().get(0).getWeather().get(0).getMain();
+                    Log.d("Description", weatherDescription);
+                    Log.d("mainDescription", weatherMainDescription);
 
                     cityNameTv.setText(cityName + ", " + separateCity.getList().get(0).getSys().getCountry());
                     weatherDescTv.setText(weatherDescription);
@@ -154,14 +155,14 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                     tempMinTv.setText("min: " + separateCity.getList().get(0).getMain().getTempMin() + "°C");
                     Log.d("Art", separateCity.getList().get(0).getWeather().get(0).getIcon());
 
-                    String weatherIcon=separateCity.getList().get(0).getWeather().get(0).getIcon();
-                    setTitleIcon(weatherIcon,tittleIcon);
+                    String weatherIcon = separateCity.getList().get(0).getWeather().get(0).getIcon();
+                    setTitleIcon(weatherIcon, tittleIcon);
 
-                   // Log.d("Icon", separateCity.getList().get(0).getWeather().get(0).getIcon() + " fragment");
-                     cityMainIcon.setImageResource(iconByDescription(weatherMainDescription,weatherIcon));
+                    // Log.d("Icon", separateCity.getList().get(0).getWeather().get(0).getIcon() + " fragment");
+                    cityMainIcon.setImageResource(iconByDescription(weatherMainDescription, weatherIcon));
 
-                     Integer dateTime=separateCity.getList().get(0).getDt();
-                     Log.d("DataTime",dateTime+"");
+                    Integer dateTime = separateCity.getList().get(0).getDt();
+                    Log.d("DataTime", dateTime + "");
                 }
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
@@ -191,10 +192,10 @@ public class CityFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private int iconByDescription(String description,String weatherIcon) {
+    private int iconByDescription(String description, String weatherIcon) {
         switch (description) {
             case CLEAR_SKY:
-                if(weatherIcon.endsWith("d")){
+                if (weatherIcon.endsWith("d")) {
                     return R.drawable.clear_sky_day;
                 }
                 return R.drawable.clear_night;
@@ -209,7 +210,7 @@ public class CityFragment extends Fragment implements View.OnClickListener {
             case SNOW:
                 return R.drawable.snow;
             case Drizzle:
-                if(weatherIcon.endsWith("d")){
+                if (weatherIcon.endsWith("d")) {
                     return R.drawable.drizzle_day;
                 }
                 return R.drawable.drizzle_night;
@@ -219,7 +220,8 @@ public class CityFragment extends Fragment implements View.OnClickListener {
         }
         return R.drawable.sun_separate_city_icon;
     }
-    private void setTitleIcon(String iconName,ImageView tittleIcon){
+
+    private void setTitleIcon(String iconName, ImageView tittleIcon) {
         Glide.with(getActivity()).load("http://openweathermap.org/img/w/" + iconName + ".png").listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -238,8 +240,9 @@ public class CityFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-                //Toast.makeText(getActivity(), "Worked", Toast.LENGTH_SHORT).show();
-                (getActivity()).onBackPressed();
+                // (getActivity()).onBackPressed();
+
+                ((MainActivity) getActivity()).backToHomeScreen();
                 break;
         }
     }

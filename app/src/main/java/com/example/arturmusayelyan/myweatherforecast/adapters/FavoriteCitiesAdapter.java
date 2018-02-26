@@ -3,6 +3,7 @@ package com.example.arturmusayelyan.myweatherforecast.adapters;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.ArrayList;
@@ -25,26 +27,23 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
     private ArrayList<WeatherList> favoriteCitiesList;
     private Context context;
     private RecyclerItemClickListener recyclerItemClickListener;
-    //private int rowCount;
 
-    public FavoriteCitiesAdapter(FragmentActivity context, ArrayList<WeatherList> favoriteCitiesList){
-        this.context=context;
-        this.favoriteCitiesList=favoriteCitiesList;
-       // this.rowCount=rowCount;
+    public FavoriteCitiesAdapter(FragmentActivity context, ArrayList<WeatherList> favoriteCitiesList) {
+        this.context = context;
+        this.favoriteCitiesList = favoriteCitiesList;
     }
+
     public void setRecyclerItemClickListener(RecyclerItemClickListener itemClickListener) {
         this.recyclerItemClickListener = itemClickListener;
     }
-    private void downloadImage(String icon,int position,ImageView weatherIcon,WeatherList weatherList){
-        Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
 
-//        separateCity.setIcon(icon);
-//        separateCity.setPosition(position);
+    private void downloadImage(String icon, ImageView weatherIcon) {
+        Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.favorite_row_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.favorite_row_item, parent, false);
         return new MyViewHolder(view);
     }
 
@@ -60,11 +59,11 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
         holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
 
         String icon = favoriteCitiesList.get(position).getWeather().get(0).getIcon();
-        downloadImage(icon, position, holder.weatherIcon, currentWeather);
+        downloadImage(icon, holder.weatherIcon);
 
-        holder.checkBox.setChecked(favoriteCitiesList.get(position).isChecked());
+        // holder.checkBox.setChecked(favoriteCitiesList.get(position).isChecked());
+        holder.checkBox.setChecked(true);
     }
-
 
 
     @Override
@@ -73,8 +72,7 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
     }
 
 
-
-    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView cityTv, tempratureTv;
         private ImageView weatherIcon;
         private CheckBox checkBox;
@@ -89,19 +87,20 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(checkBox.isChecked()){
-                        favoriteCitiesList.get(getAdapterPosition()).setChecked(true);
-                    }else {
-                        favoriteCitiesList.get(getAdapterPosition()).setChecked(false);
+                    if (checkBox.isChecked()) {
+                        //  favoriteCitiesList.get(getAdapterPosition()).setChecked(true);
+                    } else {
+                        //favoriteCitiesList.get(getAdapterPosition()).setChecked(false);
+
+                        recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
                     }
-                  //  recyclerItemClickListener.onItemClick(v,favoriteCitiesList.get(getAdapterPosition()),getAdapterPosition());
                 }
             });
         }
 
         @Override
         public void onClick(View v) {
-
+            recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
         }
     }
 

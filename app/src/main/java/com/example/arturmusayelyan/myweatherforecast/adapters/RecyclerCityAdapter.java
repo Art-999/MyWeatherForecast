@@ -56,28 +56,6 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
         holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
 
 
-        // Glide.with(context).load("http://openweathermap.org/img/w/"+dataList.get(holder.getAdapterPosition()).getWeather().get(0).getIcon()+".png").into(holder.weatherIcon);
-        // holder.weatherIcon.setImageDrawable(null);
-
-        //  holder.weatherIcon.setImageDrawable(null);
-//                listener(new RequestListener<Drawable>() {
-//            @Override
-//            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-////holder.weatherIcon.setImageDrawable(resource);
-//                holder.weatherIcon.setImageDrawable(null);
-//                return false;
-//            }
-//        }).into(holder.weatherIcon);
-
-//        if (customCitiesList != null && customCitiesList.size() >=0) {
-//            //holder.checkBox.setChecked(true);
-//            addChecks(holder.checkBox, currentCityName);
-//        }
         String icon = dataList.get(position).getWeather().get(0).getIcon();
         downloadImage(icon, position, holder.weatherIcon, currentWeather);
 
@@ -94,7 +72,6 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
     @Override
     public int getItemCount() {
-
         return dataList.size();
     }
 
@@ -110,27 +87,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
             weatherIcon = itemView.findViewById(R.id.row_city_image);
             checkBox = itemView.findViewById(R.id.custom_check_box);
             itemView.setOnClickListener(this);
-//            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                    if(buttonView.isChecked()) {
-//                        dataList.get(getAdapterPosition()).setChecked(isChecked);
-//                      //  recyclerItemClickListener.onItemClick(buttonView, dataList.get(getAdapterPosition()), getAdapterPosition());
-//                      //  selectedItemList.add(getAdapterPosition(),String.valueOf(getAdapterPosition()));
-//
-//                        selectedItemList.add(String.valueOf(getAdapterPosition()));
-//                       // Log.d("Art",selectedItemList.toString());
-//                        recyclerItemClickListener.onItemClick(buttonView,dataList.get(getAdapterPosition()),getAdapterPosition());
-//                    }
-//                    else {
-//                    //   selectedItemList.remove(getAdapterPosition());
-//                        dataList.get(getAdapterPosition()).setChecked(isChecked);
-//                        selectedItemList.remove(String.valueOf(getAdapterPosition()));
-//                      //  Log.d("Art",selectedItemList.toString());
-//                        recyclerItemClickListener.onItemClick(buttonView,dataList.get(getAdapterPosition()),getAdapterPosition());
-//                    }
-//                }
-//            });
+
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -149,7 +106,6 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
         public void onClick(View view) {
             recyclerItemClickListener.onItemClick(view,dataList.get(getAdapterPosition()),getAdapterPosition());
             }
-
 
     }
 }
