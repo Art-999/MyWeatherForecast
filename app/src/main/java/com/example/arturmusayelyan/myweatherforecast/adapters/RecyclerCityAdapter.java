@@ -6,17 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
-import com.example.arturmusayelyan.myweatherforecast.models.CustomCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,14 +24,12 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     private List<WeatherList> dataList;
     private RecyclerItemClickListener recyclerItemClickListener;
     private Context context;
-    private ArrayList<CustomCity> customCitiesList = new ArrayList<>();
-    private ArrayList<String> selectedItemList=new ArrayList<>();
 
-    public RecyclerCityAdapter(List<WeatherList> dataList, Context context,ArrayList<String> selectedItemList) {
+
+    public RecyclerCityAdapter(List<WeatherList> dataList, Context context) {
         //setHasStableIds(true);
         this.dataList = dataList;
         this.context = context;
-        this.selectedItemList=selectedItemList;
     }
 
     public void setRecyclerItemClickListener(RecyclerItemClickListener itemClickListener) {
@@ -84,38 +79,14 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 //            addChecks(holder.checkBox, currentCityName);
 //        }
         String icon = dataList.get(position).getWeather().get(0).getIcon();
-
         downloadImage(icon, position, holder.weatherIcon, currentWeather);
 
-//if(currentWeather.)
-
-
-//      if(dataList.get(position).isChecked()){
-//          holder.checkBox.setChecked(true);
-//      }
-//      else {
-//          holder.checkBox.setChecked(false);
-//      }
-
-//       if(dataList.get(position).equals(selectedItemList.get(position))){
-//           holder.checkBox.setChecked(true);
-//       }
-//       else {
-//           holder.checkBox.setChecked(false);
-//       }
-//
-        if (selectedItemList.indexOf(String.valueOf(position)) >= 0) {
-            holder.checkBox.setChecked(true);
-        } else {
-            holder.checkBox.setChecked(false);
-        }
-
+        holder.checkBox.setChecked(dataList.get(position).isChecked());
     }
     private void downloadImage(String icon,int position,ImageView weatherIcon,WeatherList weatherList){
         Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
         weatherList.setIcon(icon);
         weatherList.setPosition(position);
-        //notifyItemInserted(position);
     }
 
 
@@ -139,60 +110,44 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
             weatherIcon = itemView.findViewById(R.id.row_city_image);
             checkBox = itemView.findViewById(R.id.custom_check_box);
             itemView.setOnClickListener(this);
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                    if(buttonView.isChecked()) {
+//                        dataList.get(getAdapterPosition()).setChecked(isChecked);
+//                      //  recyclerItemClickListener.onItemClick(buttonView, dataList.get(getAdapterPosition()), getAdapterPosition());
+//                      //  selectedItemList.add(getAdapterPosition(),String.valueOf(getAdapterPosition()));
+//
+//                        selectedItemList.add(String.valueOf(getAdapterPosition()));
+//                       // Log.d("Art",selectedItemList.toString());
+//                        recyclerItemClickListener.onItemClick(buttonView,dataList.get(getAdapterPosition()),getAdapterPosition());
+//                    }
+//                    else {
+//                    //   selectedItemList.remove(getAdapterPosition());
+//                        dataList.get(getAdapterPosition()).setChecked(isChecked);
+//                        selectedItemList.remove(String.valueOf(getAdapterPosition()));
+//                      //  Log.d("Art",selectedItemList.toString());
+//                        recyclerItemClickListener.onItemClick(buttonView,dataList.get(getAdapterPosition()),getAdapterPosition());
+//                    }
+//                }
+//            });
+            checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(buttonView.isChecked()) {
-                        dataList.get(getAdapterPosition()).setChecked(isChecked);
-                      //  recyclerItemClickListener.onItemClick(buttonView, dataList.get(getAdapterPosition()), getAdapterPosition());
-                        selectedItemList.add(getAdapterPosition(),String.valueOf(getAdapterPosition()));
+                public void onClick(View v) {
+                    if(checkBox.isChecked()){
+                        dataList.get(getAdapterPosition()).setChecked(true);
+                    }else {
+                        dataList.get(getAdapterPosition()).setChecked(false);
                     }
-                    else {
-                       selectedItemList.remove(getAdapterPosition());
-                    }
+                    recyclerItemClickListener.onItemClick(v,dataList.get(getAdapterPosition()),getAdapterPosition());
                 }
             });
         }
 
+
         @Override
         public void onClick(View view) {
-            //recyclerItemClickListener.onItemClick(cityTv.getText().toString());
-            String cityName = dataList.get(getAdapterPosition()).getName();
-//            if ((view.getId() == R.id.row_city_tv) || (view.getId() == R.id.row_temp_tv) || (view.getId() == R.id.row_city_image)) {
-//                recyclerItemClickListener.onItemClick(view,dataList.get(getAdapterPosition()),getAdapterPosition());
-//            }
             recyclerItemClickListener.onItemClick(view,dataList.get(getAdapterPosition()),getAdapterPosition());
-
-//            else if (view.getId() == R.id.custom_check_box) {
-//                CheckBox currentCheckBox = (CheckBox) view;
-//                if (!currentCheckBox.isChecked()) {
-                   // Toast.makeText(context, cityName + " removed from favorite list", Toast.LENGTH_SHORT).show();
-//                    if (customCitiesList != null && customCitiesList.size() > 0) {
-//                        for (int i = 0; i < customCitiesList.size(); i++) {
-//                            if (customCitiesList.get(i).getName().equals(cityName)) {
-//                                customCitiesList.remove(i);
-//                                customCitiesList.add(new CustomCity(cityName, false));
-//
-//                                dataList.get(getAdapterPosition()).setChecked(false);
-//                                return;
-//                            }
-//                        }
-//                    }
-                   // recyclerItemClickListener.onItemClick(dataList.get(getAdapterPosition()),true);
-//                } else {
-                   // Toast.makeText(context, cityName + " added to favorite list", Toast.LENGTH_SHORT).show();
-//                    if (customCitiesList != null && customCitiesList.size() > 0) {
-//                        for (int i = 0; i < customCitiesList.size(); i++) {
-//                            if (customCitiesList.get(i).getName().equals(cityName)) {
-//                                customCitiesList.remove(i);
-//                                customCitiesList.add(new CustomCity(cityName, true));
-//
-//                                dataList.get(getAdapterPosition()).setChecked(true);
-//                                return;
-//                            }
-//                        }
-//                    }
- //               }
             }
 
 

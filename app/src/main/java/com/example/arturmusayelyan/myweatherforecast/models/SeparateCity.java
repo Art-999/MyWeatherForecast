@@ -20,6 +20,33 @@ public class SeparateCity {
     @SerializedName("list")
     @Expose
     private java.util.List<List> list = null;
+    private String icon;
+    private int position;
+    private boolean checked;
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     public String getMessage() {
         return message;

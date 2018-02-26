@@ -18,4 +18,10 @@ public interface ApiInterface {
 
     @GET("find?&units=metric&APPID=06c0cd0ecefd895a9600f56949423d8e")
     Call<SeparateCity> getCityWeather(@Query("q") String cityName);
+
+    @GET("find?&units=metric&APPID=06c0cd0ecefd895a9600f56949423d8e")
+    Call<SeparateCity> getFavoriteCityWeather(@Query("q") String cityName);
+
+    @GET("group?&units=metric&APPID=06c0cd0ecefd895a9600f56949423d8e")
+    Call<Example> getFavoriteCitesWeatherList(@Query("id")String citiesNames);
 }

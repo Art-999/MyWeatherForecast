@@ -1,6 +1,5 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +22,7 @@ import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
+import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
@@ -57,10 +57,12 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     private TextView toolbarTitle;
     private ImageView toolbarImage;
     private Loader loader;
-    private RecyclerItemClickListener itemClickListener;
     private ImageView slaqButton;
-    private Context context;
-    private ArrayList<String> selectedItemsList= new ArrayList<>();
+
+    private int k;
+    private ArrayList<WeatherList> favoriteDataList;
+    private ArrayList<String> favoritecitesIDList;
+
 
     public MainFragment() {
 
@@ -82,12 +84,10 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        context = getActivity();
-        //itemClickListener = (RecyclerItemClickListener) context;
         init(view);
         doGroupCityCall();
-        // onItemClick = (RecyclerItemClickListener) getActivity();
 
+        favoriteDataList=new ArrayList<>();
     }
 
     private void init(View view) {
@@ -119,31 +119,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
             public boolean onQueryTextSubmit(String query) {
                 UIUtil.hideKeyboard(getActivity());
                 doSeparateCityCall(query);
-//                for (int i = 0; i < dataList.size(); i++) {
-//                    if (query.equalsIgnoreCase(dataList.get(i).getName())) {
-//                        Toast.makeText(MainActivity.this, "This city already exist in screen", Toast.LENGTH_SHORT).show();
-////                     if(i>=5){
-//                        recyclerView.smoothScrollToPosition(i);
-//                        //                    }
-////                     else if(i==4){
-////                         recyclerView.smoothScrollToPosition(i-4);
-////                     }
-////                     else if(i==3){
-////                         recyclerView.smoothScrollToPosition(i-3);
-////                     }
-////                     else if(i==2){
-////                         recyclerView.smoothScrollToPosition(i-2);
-////                     }
-////                     else if(i==1){
-////                         recyclerView.smoothScrollToPosition(i-1);
-////                     }
-////                     else {
-////                         recyclerView.smoothScrollToPosition(i);
-////                     }
-//
-//                        return false;
-//                    }
-//                }
                 searchView.onActionViewCollapsed();
                 return false;
             }
@@ -171,12 +146,13 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
             @Override
             public void onRefresh() {
                // doGroupCityCall();
+                loader.start();
                 adapter.notifyItemRangeChanged(0,dataList.size());
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
+                    loader.end();
                 }
-                Log.d("SelectedItems",selectedItemsList.toString());
             }
         });
         layoutManager = new LinearLayoutManager(getActivity());
@@ -189,7 +165,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     }
 
     private void initRecCityAdapter(List<WeatherList> dataList) {
-        adapter = new RecyclerCityAdapter(dataList, getActivity(),selectedItemsList);
+        adapter = new RecyclerCityAdapter(dataList, getActivity());
         adapter.setRecyclerItemClickListener(this);
         recyclerView.setAdapter(adapter);
     }
@@ -200,7 +176,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
-                Log.d("Artur", response.body().toString());
+              //  Log.d("Artur", response.body().toString());
 
                 dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
@@ -262,18 +238,70 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-                ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
+//                ArrayList<String> favoriteCitiesName=new ArrayList<>();
+//                    for (int i = 0; i < favoriteDataList.size(); i++) {
+//                        favoriteCitiesName.add(favoriteDataList.get(i).getName());
+//                    }
+//                    if(favoriteCitiesName.size()>0){
+//                        ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(favoriteCitiesName), true);
+//                        Log.d("Art", favoriteDataList.size() + "");
+//                    }
+//                    else {
+//                        Toast.makeText(getActivity(),R.string.empty_favorites,Toast.LENGTH_SHORT).show();
+//              }
+
+    //doGroupCitiesCallByCustomNames();
+                Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
+doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY());
                 break;
         }
     }
+    private void doGroupCitiesCallByCustomNames(String query){
+        loader.start();
+
+        Call<Example> call=apiInterface.getFavoriteCitesWeatherList(query);
+        call.enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Call<Example> call, Response<Example> response) {
+                Log.d("Art",response.body().getList().toString());
+
+            }
+
+            @Override
+            public void onFailure(Call<Example> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     @Override
     public void onItemClick(View view, WeatherList weatherList, int position) {
-        //doSeparateCityCall(weatherList.getName());
         switch (view.getId()) {
             case R.id.custom_check_box:
-               // dataList.get(position).setChecked(weatherList.isChecked());
-                selectedItemsList.add(String.valueOf(position));
+                if(weatherList.isChecked()){
+                   k++;
+                    Log.d("Art",k+"");
+
+//                    weatherList.setPosition(position);
+//                    weatherList.setChecked(true);
+//                    favoriteDataList.add(weatherList);
+
+                    FavoritesController.getInstance().addID(String.valueOf(weatherList.getId()));
+                    Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
+                }
+                else {
+                    k--;
+                    Log.d("Art",k+"");
+
+//                    weatherList.setPosition(position);
+//                    weatherList.setChecked(false);
+//                    favoriteDataList.remove(weatherList);
+
+                    FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
+                    Log.d("Art",FavoritesController.getInstance().favoriteSitesIdListInfo());
+                }
+
                 break;
             default:
                 ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true);
