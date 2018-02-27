@@ -15,7 +15,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.FavoriteCitiesAdapter;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
@@ -43,8 +44,8 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
     private ApiInterface apiInterface;
     private FavoriteCitiesAdapter adapter;
     private java.util.List<WeatherList> dataList;
-
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FragmentsComunicateListener fragmentsComunicateListener;
 
     public FavoritesFragment() {
 
@@ -56,7 +57,12 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         FavoritesFragment fragment = new FavoritesFragment();
 
         fragment.setArguments(bundle);
+
         return fragment;
+    }
+
+    public void setFragmentsComunicateListener(FragmentsComunicateListener fragmentsComunicateListener) {
+        this.fragmentsComunicateListener = fragmentsComunicateListener;
     }
 
     @Nullable
@@ -69,8 +75,6 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         init(view);
-
-
         doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY(), true);
     }
 
@@ -142,11 +146,12 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         switch (view.getId()) {
             case R.id.custom_check_box:
                 FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
-                MainFragment.adapter.notifyItemRangeChanged(0, MainFragment.dataList.size());
+                // MainFragment.adapter.notifyItemRangeChanged(0, MainFragment.dataList.size());
+                fragmentsComunicateListener.onFragmentClick(view, position);
 
                 adapter.getList().remove(position);
-                if(adapter.getList().isEmpty()){
-                    ((MainActivity)getActivity()).onBackPressed();
+                if (adapter.getList().isEmpty()) {
+                    ((MainActivity) getActivity()).onBackPressed();
                     return;
                 }
                 Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());

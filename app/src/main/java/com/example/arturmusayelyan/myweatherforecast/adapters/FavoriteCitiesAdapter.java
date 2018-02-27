@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.ArrayList;

@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 
 public class FavoritesController {
-    private final String SHARED_PREFS_FILE = "sharedPreferencesKey";
+    private final String SHARED_PREFS_FILE = "sharedPreferencesKey1";
     private static FavoritesController instance = null;
     private static ArrayList<String> favoriteCitesIdList;
     private ArrayList<String> favoriteCitesNameList;

@@ -19,7 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
@@ -43,21 +44,19 @@ import retrofit2.Response;
  * Created by artur.musayelyan on 20/02/2018.
  */
 
-public class MainFragment extends Fragment implements View.OnClickListener, RecyclerItemClickListener {
-    //public static boolean MAINFRAGMENT
+public class MainFragment extends Fragment implements View.OnClickListener, RecyclerItemClickListener, FragmentsComunicateListener {
 
     private RecyclerView recyclerView;
-    public static RecyclerCityAdapter adapter;
+    private RecyclerCityAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ApiInterface apiInterface;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
-    public static List<WeatherList> dataList;
+    private List<WeatherList> dataList;
     private TextView toolbarTitle;
     private ImageView toolbarImage;
     private Loader loader;
     private ImageView slaqButton;
-
     private int k;
 
     public MainFragment() {
@@ -139,14 +138,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // doGroupCityCall();
                 loader.start();
                 doGroupCityCall(false);
-
-//                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
-//                    swipeRefreshLayout.setRefreshing(false);
-//                    loader.end();
-//                }
             }
         });
         layoutManager = new LinearLayoutManager(getActivity());
@@ -211,6 +204,9 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
 
                     ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(cityName), true);
+                    toolbarImage.setVisibility(View.VISIBLE);
+                    toolbarTitle.setVisibility(View.VISIBLE);
+                    loader.end();
                     return;
                 }
 
@@ -240,12 +236,14 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 // Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 if (FavoritesController.getInstance() != null) {
                     if (FavoritesController.getInstance().getFavoriteCitesIdList().size() > 0) {
-                        ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
+                        FavoritesFragment favoritesFragment=FavoritesFragment.newInstance();
+                        favoritesFragment.setFragmentsComunicateListener(this);
+                        ((MainActivity) getActivity()).pushFragment(favoritesFragment, true);
                         return;
                     }
                 }
 
-                    Toast.makeText(getActivity(), R.string.empty_favorites, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.empty_favorites, Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -275,5 +273,10 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 break;
         }
 
+    }
+
+    @Override
+    public void onFragmentClick(View view, int position) {
+        adapter.notifyItemRangeChanged(position, dataList.size());
     }
 }

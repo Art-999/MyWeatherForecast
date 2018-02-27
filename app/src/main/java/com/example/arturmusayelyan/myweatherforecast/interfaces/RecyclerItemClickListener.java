@@ -1,4 +1,4 @@
-package com.example.arturmusayelyan.myweatherforecast;
+package com.example.arturmusayelyan.myweatherforecast.interfaces;
 
 import android.view.View;
 

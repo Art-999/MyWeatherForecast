@@ -10,8 +10,8 @@
         android:id="@+id/toolbar_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <include
-            layout="@layout/toolbar_main" />
+
+        <include layout="@layout/toolbar_main" />
     </FrameLayout>
 
 
@@ -29,8 +29,8 @@
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/rowBackground"
-        android:layout_below="@id/slaq_button">
+        android:layout_below="@id/slaq_button"
+        android:background="@color/rowBackground">
 
         <RelativeLayout
             android:id="@+id/relative_for_recycle"
@@ -42,6 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </RelativeLayout>
+
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

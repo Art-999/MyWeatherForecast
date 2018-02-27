@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
 
@@ -22,13 +23,15 @@ public class MainActivity extends AppCompatActivity {
 //        doGroupCityCall();
 
         FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
+        AllCitiesController.getInstance().getAllCitiesListFromSharedPref(this);
+
         pushFragment(MainFragment.newInstance(), false);
     }
 
 
     @Override
     public void onBackPressed() {
-            super.onBackPressed();
+        super.onBackPressed();
 
     }
 
@@ -60,5 +63,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
+        AllCitiesController.getInstance().saveAllCitiesListToSharedPref(this);
     }
 }
