@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +20,6 @@ import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.FavoriteCitiesAdapter;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
-import com.example.arturmusayelyan.myweatherforecast.models.List;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
@@ -57,6 +54,7 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         Bundle bundle = new Bundle();
 
         FavoritesFragment fragment = new FavoritesFragment();
+
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -144,7 +142,14 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         switch (view.getId()) {
             case R.id.custom_check_box:
                 FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
-                Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                MainFragment.adapter.notifyItemRangeChanged(0, MainFragment.dataList.size());
+
+                adapter.getList().remove(position);
+                if(adapter.getList().isEmpty()){
+                    ((MainActivity)getActivity()).onBackPressed();
+                    return;
+                }
+                Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(position, FavoritesController.getInstance().getFavoriteCitesIdList().size());
                 break;

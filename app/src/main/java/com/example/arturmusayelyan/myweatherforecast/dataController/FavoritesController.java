@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class FavoritesController {
     private static FavoritesController instance = null;
-    private ArrayList<String> favoriteCitesIdList;
+    private static ArrayList<String> favoriteCitesIdList;
     private ArrayList<String> favoriteCitesNameList;
 
     private FavoritesController() {
@@ -22,6 +22,7 @@ public class FavoritesController {
     public static FavoritesController getInstance() {
         if (instance == null) {
             instance = new FavoritesController();
+            favoriteCitesIdList=new ArrayList<>();
         }
         return instance;
     }
@@ -44,7 +45,7 @@ public class FavoritesController {
         }
     }
 
-    public String favoriteSitesIdListInfo() {
+    public String favoriteCitesIdListInfo() {
         if (favoriteCitesIdList != null) {
             return favoriteCitesIdList.toString();
         }

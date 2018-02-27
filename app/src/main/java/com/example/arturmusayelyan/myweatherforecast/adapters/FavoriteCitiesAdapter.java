@@ -3,7 +3,6 @@ package com.example.arturmusayelyan.myweatherforecast.adapters;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.RecyclerItemClickListener;
-import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.ArrayList;
@@ -69,6 +67,7 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
     @Override
     public int getItemCount() {
         return favoriteCitiesList.size();
+       // return FavoritesController.getInstance().getFavoriteCitesIdList().size();
     }
 
 
@@ -87,12 +86,13 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
+
+
                     if (checkBox.isChecked()) {
                         //  favoriteCitiesList.get(getAdapterPosition()).setChecked(true);
                     } else {
                         //favoriteCitiesList.get(getAdapterPosition()).setChecked(false);
-
-                        recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
                     }
                 }
             });
@@ -102,6 +102,10 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
         public void onClick(View v) {
             recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
         }
+    }
+
+    public ArrayList<WeatherList> getList() {
+        return favoriteCitiesList;
     }
 
 }

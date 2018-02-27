@@ -32,7 +32,6 @@ import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import es.dmoral.toasty.Toasty;
@@ -48,12 +47,12 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     //public static boolean MAINFRAGMENT
 
     private RecyclerView recyclerView;
-    private RecyclerCityAdapter adapter;
+    public static RecyclerCityAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ApiInterface apiInterface;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
-    private List<WeatherList> dataList;
+    public static List<WeatherList> dataList;
     private TextView toolbarTitle;
     private ImageView toolbarImage;
     private Loader loader;
@@ -238,7 +237,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         switch (v.getId()) {
             case R.id.slaq_button:
                 //doGroupCitiesCallByCustomNames();
-                // Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                // Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 if (FavoritesController.getInstance() != null) {
                     if (FavoritesController.getInstance().getFavoriteCitesIdList().size() > 0) {
                         ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
@@ -261,13 +260,13 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                     Log.d("Art", k + "");
 
                     FavoritesController.getInstance().addID(String.valueOf(weatherList.getId()));
-                    Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                    Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 } else {
                     k--;
                     Log.d("Art", k + "");
 
                     FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
-                    Log.d("Art", FavoritesController.getInstance().favoriteSitesIdListInfo());
+                    Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 }
 
                 break;
