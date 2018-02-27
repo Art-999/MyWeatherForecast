@@ -4,29 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
-import com.example.arturmusayelyan.myweatherforecast.fragments.CityFragment;
-import com.example.arturmusayelyan.myweatherforecast.fragments.FavoritesFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
-import com.example.arturmusayelyan.myweatherforecast.models.City;
-import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
-import com.example.arturmusayelyan.myweatherforecast.views.Loader;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 //        init();
 //        doGroupCityCall();
 
+        FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
         pushFragment(MainFragment.newInstance(), false);
     }
 
@@ -72,5 +56,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
+    }
 }
