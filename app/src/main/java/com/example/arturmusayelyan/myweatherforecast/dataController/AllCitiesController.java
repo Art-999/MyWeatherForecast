@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class AllCitiesController {
     private final String SHARED_PREFS_FILE = "sharedPreferencesKey2";
     private static AllCitiesController instance = null;
-    private ArrayList<WeatherList> allCitiesIdList;
+    private ArrayList<WeatherList> allCitiesList;
 
     private AllCitiesController() {
 
@@ -28,52 +28,62 @@ public class AllCitiesController {
         return instance;
     }
 
-    public ArrayList<WeatherList> getAllCitiesIdList() {
-        return allCitiesIdList;
+    public ArrayList<WeatherList> getAllCitiesList() {
+        return allCitiesList;
     }
 
     public void getAllCitiesListFromSharedPref(Context context) {
-        if (allCitiesIdList == null) {
-            allCitiesIdList = new ArrayList<>();
+        if (allCitiesList == null) {
+            allCitiesList = new ArrayList<>();
         }
 
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
-        allCitiesIdList.clear();
+        allCitiesList.clear();
         int size = preferences.getInt("Status_size", 0);
         for (int i = 0; i < size; i++) {
             Gson gson = new Gson();
-            allCitiesIdList.add(gson.fromJson(preferences.getString("Status_" + i, null), WeatherList.class));
+            allCitiesList.add(gson.fromJson(preferences.getString("Status_" + i, null), WeatherList.class));
         }
     }
 
     public void saveAllCitiesListToSharedPref(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("Status_size", allCitiesIdList.size());
-        for (int i = 0; i < allCitiesIdList.size(); i++) {
+        editor.putInt("Status_size", allCitiesList.size());
+        for (int i = 0; i < allCitiesList.size(); i++) {
             editor.remove("Status_" + i);
             Gson gson = new Gson();
-            editor.putString("Status_" + i, gson.toJson(allCitiesIdList.get(i)));
+            editor.putString("Status_" + i, gson.toJson(allCitiesList.get(i)));
         }
         editor.commit();
     }
 
     public void addWeatherListObject(WeatherList weatherList) {
-        if (allCitiesIdList == null) {
-            allCitiesIdList = new ArrayList<>();
+        if (allCitiesList == null) {
+            allCitiesList = new ArrayList<>();
         }
-        allCitiesIdList.add(weatherList);
+        allCitiesList.add(weatherList);
 
     }
 
     public void removeWeatherListObject(WeatherList weatherList) {
-        if (allCitiesIdList != null) {
-            allCitiesIdList.remove(weatherList);
+        if (allCitiesList != null) {
+            allCitiesList.remove(weatherList);
         }
     }
     public void deleteAllCitiesList(){
-       if(allCitiesIdList!=null){
-           allCitiesIdList.clear();
+       if(allCitiesList !=null){
+           allCitiesList.clear();
        }
+    }
+    public String createGroupCitiesQUERY() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < allCitiesList.size(); i++) {
+            builder.append(String.valueOf(allCitiesList.get(i).getId()));
+            if (i != (allCitiesList.size() - 1)) {
+                builder.append(",");
+            }
+        }
+        return new String(builder);
     }
 }

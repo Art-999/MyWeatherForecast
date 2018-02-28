@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
         AllCitiesController.getInstance().getAllCitiesListFromSharedPref(this);
-        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
+        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().toString());
 
         pushFragment(MainFragment.newInstance(), false);
     }
@@ -71,6 +71,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
         AllCitiesController.getInstance().saveAllCitiesListToSharedPref(this);
-        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
+        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().toString());
     }
 }

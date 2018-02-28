@@ -24,4 +24,7 @@ public interface ApiInterface {
 
     @GET("group?&units=metric&APPID=06c0cd0ecefd895a9600f56949423d8e")
     Call<Example> getFavoriteCitesWeatherList(@Query("id")String citiesNames);
+
+    @GET("group?&units=metric&APPID=06c0cd0ecefd895a9600f56949423d8e")
+    Call<Example> getGroupeCitesWeatherListByQuery(@Query("id")String citiesNames);
 }
