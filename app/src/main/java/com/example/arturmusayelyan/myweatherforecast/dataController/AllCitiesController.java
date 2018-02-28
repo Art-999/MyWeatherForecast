@@ -3,6 +3,9 @@ package com.example.arturmusayelyan.myweatherforecast.dataController;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 /**
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 public class AllCitiesController {
     private final String SHARED_PREFS_FILE = "sharedPreferencesKey2";
     private static AllCitiesController instance = null;
-    private static ArrayList<String> allCitiesIdList;
+    private ArrayList<WeatherList> allCitiesIdList;
 
     private AllCitiesController() {
 
@@ -25,7 +28,7 @@ public class AllCitiesController {
         return instance;
     }
 
-    public static ArrayList<String> getAllCitiesIdList() {
+    public ArrayList<WeatherList> getAllCitiesIdList() {
         return allCitiesIdList;
     }
 
@@ -38,7 +41,8 @@ public class AllCitiesController {
         allCitiesIdList.clear();
         int size = preferences.getInt("Status_size", 0);
         for (int i = 0; i < size; i++) {
-            allCitiesIdList.add(preferences.getString("Status_" + i, null));
+            Gson gson = new Gson();
+            allCitiesIdList.add(gson.fromJson(preferences.getString("Status_" + i, null), WeatherList.class));
         }
     }
 
@@ -46,25 +50,30 @@ public class AllCitiesController {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("Status_size", allCitiesIdList.size());
-
         for (int i = 0; i < allCitiesIdList.size(); i++) {
             editor.remove("Status_" + i);
-            editor.putString("Status_" + i, allCitiesIdList.get(i));
+            Gson gson = new Gson();
+            editor.putString("Status_" + i, gson.toJson(allCitiesIdList.get(i)));
         }
         editor.commit();
     }
 
-    public void addID(String ID) {
+    public void addWeatherListObject(WeatherList weatherList) {
         if (allCitiesIdList == null) {
             allCitiesIdList = new ArrayList<>();
         }
-        allCitiesIdList.add(ID);
+        allCitiesIdList.add(weatherList);
 
     }
 
-    public void removeID(String ID) {
+    public void removeWeatherListObject(WeatherList weatherList) {
         if (allCitiesIdList != null) {
-            allCitiesIdList.remove(ID);
+            allCitiesIdList.remove(weatherList);
         }
+    }
+    public void deleteAllCitiesList(){
+       if(allCitiesIdList!=null){
+           allCitiesIdList.clear();
+       }
     }
 }

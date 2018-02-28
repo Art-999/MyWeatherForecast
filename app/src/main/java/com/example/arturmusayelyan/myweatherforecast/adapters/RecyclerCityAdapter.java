@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.OnSwipeTouchListener;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
@@ -103,11 +104,9 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                     //super.onSwipeLeft();
                     Toast.makeText(context,"Left worked",Toast.LENGTH_SHORT).show();
                     dataList.remove(dataList.get(getAdapterPosition()));
+                    AllCitiesController.getInstance().removeWeatherListObject(dataList.get(getAdapterPosition()));
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(),dataList.size());
-//                    if(FavoritesController.getInstance().getFavoriteCitesIdList().indexOf(String.valueOf(dataList.get(getAdapterPosition()).getId()))>=0){
-//                        FavoritesController.getInstance().removeID(String.valueOf(dataList.get(getAdapterPosition()).getId()));
-//                    }
                 }
 
                 @Override
@@ -115,11 +114,9 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                     //super.onSwipeRight();
                     Toast.makeText(context,"Right worked",Toast.LENGTH_SHORT).show();
                     dataList.remove(dataList.get(getAdapterPosition()));
+                    AllCitiesController.getInstance().removeWeatherListObject(dataList.get(getAdapterPosition()));
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(),dataList.size());
-//                    if((FavoritesController.getInstance().getFavoriteCitesIdList().indexOf(String.valueOf(dataList.get(getAdapterPosition()).getId())))>=0){
-//                        FavoritesController.getInstance().removeID(String.valueOf(dataList.get(getAdapterPosition()).getId()));
-//                    }
                 }
 
                 @Override

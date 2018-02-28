@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
@@ -168,9 +169,23 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
                     if (fistTime) {
+                        AllCitiesController.getInstance().deleteAllCitiesList();
+                        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
+
                         initRecCityAdapter(dataList);
+                        for (int i = 0; i <dataList.size() ; i++) {
+                            AllCitiesController.getInstance().addWeatherListObject(dataList.get(i));
+                        }
+                        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
                     } else {
                         adapter.notifyItemRangeChanged(0, dataList.size());
+                        AllCitiesController.getInstance().deleteAllCitiesList();
+                        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
+
+                        for (int i = 0; i <dataList.size() ; i++) {
+                            AllCitiesController.getInstance().addWeatherListObject(dataList.get(i));
+                        }
+                        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
                     }
                 }
 
@@ -184,6 +199,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
             public void onFailure(Call<Example> call, Throwable t) {
                 Toast.makeText(getActivity(), "Check your Internet Connection", Toast.LENGTH_LONG).show();
 
+                initRecCityAdapter(AllCitiesController.getInstance().getAllCitiesIdList());
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -236,7 +252,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 // Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 if (FavoritesController.getInstance() != null) {
                     if (FavoritesController.getInstance().getFavoriteCitesIdList().size() > 0) {
-                        FavoritesFragment favoritesFragment=FavoritesFragment.newInstance();
+                        FavoritesFragment favoritesFragment = FavoritesFragment.newInstance();
                         favoritesFragment.setFragmentsComunicateListener(this);
                         ((MainActivity) getActivity()).pushFragment(favoritesFragment, true);
                         return;

@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
         AllCitiesController.getInstance().getAllCitiesListFromSharedPref(this);
+        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
 
         pushFragment(MainFragment.newInstance(), false);
     }
@@ -54,9 +56,14 @@ public class MainActivity extends AppCompatActivity {
         int backStackCount = getSupportFragmentManager().getBackStackEntryCount();
         for (int i = 0; i < backStackCount; i++) {
             int backStackFragmentId = fragmentManager.getBackStackEntryAt(i).getId();
-
             fragmentManager.popBackStack(backStackFragmentId, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //AllCitiesController.getInstance().addWeatherListObject(MainFragment.dataList.get(1));
     }
 
     @Override
@@ -64,5 +71,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
         AllCitiesController.getInstance().saveAllCitiesListToSharedPref(this);
+        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesIdList().toString());
     }
 }
