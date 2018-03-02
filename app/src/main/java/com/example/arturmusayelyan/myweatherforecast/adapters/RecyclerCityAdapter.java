@@ -25,15 +25,26 @@ import java.util.List;
  * Created by artur.musayelyan on 13/02/2018.
  */
 
-public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapter.MyViewHolder> {
-   // private List<WeatherList> dataList;
+public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapter.MyViewHolder>  {
+    private List<WeatherList> dataList;
     private RecyclerItemClickListener recyclerItemClickListener;
     private Context context;
+//    ItemTouchHelper.SimpleCallback simpleCallback=new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
+//        @Override
+//        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+//            return false;
+//        }
+//
+//        @Override
+//        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+//
+//        }
+//    };
 
 
-    public RecyclerCityAdapter(List<WeatherList> dataList, Context context) {
-        //setHasStableIds(true);
-       // this.dataList = dataList;
+    public RecyclerCityAdapter(Context context,List<WeatherList> dataList) {
+        this.dataList = dataList;
+        //dataList=AllCitiesController.getInstance().getAllCitiesList();
         this.context = context;
     }
 
@@ -44,15 +55,13 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_item, parent, false);
-        MyViewHolder holder = new MyViewHolder(view);
-        //holder.setIsRecyclable(false);
-        return holder;
+        return new MyViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-       // WeatherList currentWeather = dataList.get(position);
-        WeatherList currentWeather = AllCitiesController.getInstance().getAllCitiesList().get(position);
+        WeatherList currentWeather = dataList.get(position);
+       // WeatherList currentWeather = AllCitiesController.getInstance().getAllCitiesList().get(position);
         String currentCityName = currentWeather.getName();
         if (currentCityName.length() > 10) {
             holder.cityTv.setTextSize(16);
@@ -61,17 +70,20 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
         holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
 
 
-       // String icon = dataList.get(position).getWeather().get(0).getIcon();
-        String icon = AllCitiesController.getInstance().getAllCitiesList().get(position).getWeather().get(0).getIcon();
+        String icon = dataList.get(position).getWeather().get(0).getIcon();
+       // String icon = AllCitiesController.getInstance().getAllCitiesList().get(position).getWeather().get(0).getIcon();
         downloadImage(icon, position, holder.weatherIcon, currentWeather);
 
         // holder.checkBox.setChecked(dataList.get(position).isChecked());
-        if (FavoritesController.getInstance().getFavoriteCitesIdList().indexOf(String.valueOf(AllCitiesController.getInstance().getAllCitiesList().get(position).getId())) >= 0) {
-            holder.checkBox.setChecked(true);
-        } else {
-            holder.checkBox.setChecked(false);
-        }
+
+//        if (FavoritesController.getInstance().getFavoriteCitesIdList().indexOf(String.valueOf(AllCitiesController.getInstance().getAllCitiesList().get(position).getId())) >= 0) {
+//            holder.checkBox.setChecked(true);
+//        } else {
+//            holder.checkBox.setChecked(false);
+//        }
+       holder.checkBox.setChecked(AllCitiesController.getInstance().getAllCitiesList().get(position).isChecked());
     }
+
 
     private void downloadImage(String icon, int position, ImageView weatherIcon, WeatherList weatherList) {
         Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
@@ -82,8 +94,12 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
     @Override
     public int getItemCount() {
-      //  return dataList.size();
-        return AllCitiesController.getInstance().getAllCitiesList().size();
+        return dataList.size();
+       // return AllCitiesController.getInstance().getAllCitiesList().size();
+    }
+
+    public List<WeatherList> getDataList() {
+        return dataList;
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -106,22 +122,21 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                 public void onSwipeLeft() {
                     //super.onSwipeLeft();
                     Toast.makeText(context,"Left worked",Toast.LENGTH_SHORT).show();
-                   // dataList.remove(dataList.get(getAdapterPosition()));
-                   // AllCitiesController.getInstance().removeWeatherListObject(dataList.get(getAdapterPosition()));
+                    //dataList.remove(dataList.get(getAdapterPosition()));
+
                     AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
                     notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), AllCitiesController.getInstance().getAllCitiesList().size());
+                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }
 
                 @Override
                 public void onSwipeRight() {
                     //super.onSwipeRight();
                     Toast.makeText(context,"Right worked",Toast.LENGTH_SHORT).show();
-                   // dataList.remove(dataList.get(getAdapterPosition()));
-                   // AllCitiesController.getInstance().removeWeatherListObject(dataList.get(getAdapterPosition()));
+                  //  dataList.remove(dataList.get(getAdapterPosition()));
                     AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
                     notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), AllCitiesController.getInstance().getAllCitiesList().size());
+                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }
 
                 @Override
@@ -137,10 +152,14 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                     if (checkBox.isChecked()) {
                       //  FavoritesController.getInstance().addID(String.valueOf(dataList.get(getAdapterPosition()).getId()));
                         Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
+
+                        AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()).setChecked(true);
                     } else {
 
                       //  FavoritesController.getInstance().removeID(String.valueOf(dataList.get(getAdapterPosition()).getId()));
                         Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
+
+                        AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()).setChecked(false);
                     }
                 }
             });
