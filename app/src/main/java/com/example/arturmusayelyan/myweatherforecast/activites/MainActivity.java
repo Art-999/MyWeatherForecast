@@ -10,7 +10,6 @@ import android.view.WindowManager;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
-import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,13 +19,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        init();
-//        doGroupCityCall();
 
-        FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
-        AllCitiesController.getInstance().getAllCitiesListFromSharedPref(this);
-        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().toString());
+        // FavoritesController.getInstance().getFavoriteListFromSharedPref(this);
+        // AllCitiesController.getInstance().getAllCitiesListFromSharedPref(this);
+        AllCitiesController.getInstance().getWeatherListFromPrefernces(this);
 
+        Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(this).toString());
         pushFragment(MainFragment.newInstance(), false);
     }
 
@@ -34,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
     }
 
     public void pushFragment(Fragment fragment, boolean addToBackStack) {
@@ -69,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
-        AllCitiesController.getInstance().saveAllCitiesListToSharedPref(this);
-        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().toString());
+        //FavoritesController.getInstance().saveFavoriteListToSharedPref(this);
+        // AllCitiesController.getInstance().saveAllCitiesListToSharedPref(this);
+     //   Log.d("Preferences", AllCitiesController.getInstance().getAllCitiesList().toString());
     }
 }

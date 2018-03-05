@@ -81,7 +81,9 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 //        } else {
 //            holder.checkBox.setChecked(false);
 //        }
-       holder.checkBox.setChecked(AllCitiesController.getInstance().getAllCitiesList().get(position).isChecked());
+
+       //holder.checkBox.setChecked(AllCitiesController.getInstance().getAllCitiesList().get(position).isChecked());
+     //   holder.checkBox.setChecked(AllCitiesController.getInstance().getWeatherListFromPrefernces(context).get(position).isChecked());
     }
 
 
@@ -122,9 +124,11 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                 public void onSwipeLeft() {
                     //super.onSwipeLeft();
                     Toast.makeText(context,"Left worked",Toast.LENGTH_SHORT).show();
-                    //dataList.remove(dataList.get(getAdapterPosition()));
+                    dataList.remove(dataList.get(getAdapterPosition()));
+                   // AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
+                    //AllCitiesController.getInstance().removeObjectFromPreferences(context,dataList.get(getAdapterPosition()),getAdapterPosition());
+                    Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(context).size() + "");
 
-                    AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }
@@ -133,8 +137,10 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                 public void onSwipeRight() {
                     //super.onSwipeRight();
                     Toast.makeText(context,"Right worked",Toast.LENGTH_SHORT).show();
-                  //  dataList.remove(dataList.get(getAdapterPosition()));
-                    AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
+                    dataList.remove(dataList.get(getAdapterPosition()));
+                  //  AllCitiesController.getInstance().removeWeatherListObject(AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()));
+                   // AllCitiesController.getInstance().removeObjectFromPreferences(context,dataList.get(getAdapterPosition()),getAdapterPosition());
+                    Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(context).size() + "");
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }

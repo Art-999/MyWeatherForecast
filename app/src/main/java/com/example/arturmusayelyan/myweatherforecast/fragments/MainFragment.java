@@ -83,8 +83,9 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init(view);
-        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().get(0).toString());
-        doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY());
+        // Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().get(0).toString());
+        //doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
+        doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
     }
 
     private void init(View view) {
@@ -143,7 +144,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
             @Override
             public void onRefresh() {
                 loader.start();
-                doGroupCityCall(false, AllCitiesController.getInstance().createGroupCitiesQUERY());
+                doGroupCityCall(false, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
             }
         });
         layoutManager = new LinearLayoutManager(getActivity());
@@ -175,23 +176,14 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 List<WeatherList> dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
                     if (fistTime) {
-                        AllCitiesController.getInstance().deleteAllCitiesList();
-                        Log.d("Preferences", AllCitiesController.getInstance().getAllCitiesList().toString());
-
                         initRecCityAdapter(dataList);
+                        AllCitiesController.getInstance().clearShPrferences(getActivity());
                         for (int i = 0; i < dataList.size(); i++) {
-                            AllCitiesController.getInstance().addWeatherListObject(dataList.get(i));
+                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(i));
                         }
-                        Log.d("Preferences", AllCitiesController.getInstance().getAllCitiesList().toString());
+                        Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
                     } else {
                         adapter.notifyItemRangeChanged(0, adapter.getDataList().size());
-//                        AllCitiesController.getInstance().deleteAllCitiesList();
-//                        Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().toString());
-//
-//                        for (int i = 0; i <dataList.size() ; i++) {
-//                            AllCitiesController.getInstance().addWeatherListObject(dataList.get(i));
-//                        }
-                        Log.d("Preferences", AllCitiesController.getInstance().getAllCitiesList().toString());
                     }
                 }
 
@@ -203,9 +195,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
 
             @Override
             public void onFailure(Call<Example> call, Throwable t) {
-                Toast.makeText(getActivity(), "Check your Internet Connection", Toast.LENGTH_LONG).show();
-
-                initRecCityAdapter(AllCitiesController.getInstance().getAllCitiesList());
+                Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_LONG).show();
+                initRecCityAdapter(AllCitiesController.getInstance().getWeatherListFromPrefernces(getContext()));
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -221,10 +212,27 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         call.enqueue(new Callback<SeparateCity>() {
             @Override
             public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
-                //Log.d("Weather",response.body()+"");
                 SeparateCity separateCity = response.body();
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
 
+                    Call<Example> call1 = apiInterface.getGroupeCitesWeatherListByQuery(String.valueOf(separateCity.getList().get(0).getId()));
+                    call1.enqueue(new Callback<Example>() {
+                        @Override
+                        public void onResponse(Call<Example> call, Response<Example> response) {
+                            List<WeatherList> dataList = response.body().getList();
+                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(0));
+
+                           // adapter.notifyItemInserted(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size());
+                           // adapter.notifyItemRangeChanged(0,AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size());
+                            adapter.notifyItemInserted(adapter.getDataList().size());
+                            Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
+                        }
+
+                        @Override
+                        public void onFailure(Call<Example> call, Throwable t) {
+
+                        }
+                    });
                     ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(cityName), true);
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);
