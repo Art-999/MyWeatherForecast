@@ -156,7 +156,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
     }
 
-    private void initRecCityAdapter(List<WeatherList> dataList) {
+
+    public void initRecCityAdapter(List<WeatherList> dataList) {
         adapter = new RecyclerCityAdapter(getActivity(), dataList);
         adapter.setRecyclerItemClickListener(this);
         recyclerView.setAdapter(adapter);
@@ -176,11 +177,13 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 List<WeatherList> dataList = response.body().getList();
                 if (dataList != null && !dataList.isEmpty()) {
                     if (fistTime) {
-                        initRecCityAdapter(dataList);
+
                         AllCitiesController.getInstance().clearShPrferences(getActivity());
                         for (int i = 0; i < dataList.size(); i++) {
-                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(i));
+                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(i),null,true);
                         }
+                        initRecCityAdapter(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()));
+                       // initRecCityAdapter(dataList);
                         Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
                     } else {
                         adapter.notifyItemRangeChanged(0, adapter.getDataList().size());
@@ -220,12 +223,20 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                         @Override
                         public void onResponse(Call<Example> call, Response<Example> response) {
                             List<WeatherList> dataList = response.body().getList();
-                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(0));
-
-                           // adapter.notifyItemInserted(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size());
-                           // adapter.notifyItemRangeChanged(0,AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size());
-                            adapter.notifyItemInserted(adapter.getDataList().size());
+                            WeatherList cityWeather = dataList.get(0);
+                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), cityWeather,adapter,false);
                             Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
+
+//                            List<WeatherList> adapterDataList=adapter.getDataList();
+//                            adapterDataList.add(cityWeather);
+ //                           Log.d("ShPreferences",adapterDataList.size()+"");
+//                            adapter.notifyItemInserted(adapterDataList.size()-1);
+                           // adapter.notifyItemRangeChanged(0,adapterDataList.size());
+                           // adapter.notifyItemInserted(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size()-1);
+                            recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+                            toolbarImage.setVisibility(View.VISIBLE);
+                            toolbarTitle.setVisibility(View.VISIBLE);
+                            loader.end();
                         }
 
                         @Override
@@ -233,17 +244,13 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
 
                         }
                     });
-                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(cityName), true);
+
+                }else {
+                    Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);
                     loader.end();
-                    return;
                 }
-
-                Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
-                toolbarImage.setVisibility(View.VISIBLE);
-                toolbarTitle.setVisibility(View.VISIBLE);
-                loader.end();
             }
 
 
@@ -283,7 +290,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onItemClick(View view, WeatherList weatherList, int position) {
         switch (view.getId()) {
             case R.id.custom_check_box:
-                if (weatherList.isChecked()) {
+                if (weatherList.isFavorite()) {
                     k++;
                     Log.d("Art", k + "");
 

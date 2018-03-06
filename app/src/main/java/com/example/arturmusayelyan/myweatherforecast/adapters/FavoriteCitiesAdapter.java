@@ -59,7 +59,7 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
         String icon = favoriteCitiesList.get(position).getWeather().get(0).getIcon();
         downloadImage(icon, holder.weatherIcon);
 
-        // holder.checkBox.setChecked(favoriteCitiesList.get(position).isChecked());
+        // holder.checkBox.setFavorite(favoriteCitiesList.get(position).isFavorite());
         holder.checkBox.setChecked(true);
     }
 
@@ -90,9 +90,9 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
 
 
                     if (checkBox.isChecked()) {
-                        //  favoriteCitiesList.get(getAdapterPosition()).setChecked(true);
+                        //  favoriteCitiesList.get(getAdapterPosition()).setFavorite(true);
                     } else {
-                        //favoriteCitiesList.get(getAdapterPosition()).setChecked(false);
+                        //favoriteCitiesList.get(getAdapterPosition()).setFavorite(false);
                     }
                 }
             });

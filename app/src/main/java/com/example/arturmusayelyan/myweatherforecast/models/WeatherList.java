@@ -38,7 +38,7 @@ public class WeatherList {
     @SerializedName("name")
     @Expose
     private String name;
-    private boolean checked;
+    private boolean isFavorite;
     private String icon;
     private int position;
 
@@ -58,12 +58,12 @@ public class WeatherList {
         this.icon = icon;
     }
 
-    public boolean isChecked() {
-        return checked;
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setFavorite(boolean favorite) {
+        this.isFavorite = favorite;
     }
 
     public Coord getCoord() {

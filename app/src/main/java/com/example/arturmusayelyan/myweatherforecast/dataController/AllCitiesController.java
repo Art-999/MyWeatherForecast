@@ -2,7 +2,9 @@ package com.example.arturmusayelyan.myweatherforecast.dataController;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
+import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -90,7 +92,7 @@ public class AllCitiesController {
         return new ArrayList<>();
     }
 
-    public void addObjectToPreferences(Context context, WeatherList weatherList) {
+    public void addObjectToPreferences(Context context, WeatherList weatherList, RecyclerCityAdapter adapter, boolean firstInit) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         Gson gson1 = new Gson();
         String json = preferences.getString("Status_list", null);
@@ -110,61 +112,48 @@ public class AllCitiesController {
             weatherListArrayList = new ArrayList<>();
         }
 
-        if (!weatherListArrayList.contains(weatherList)) {
+        if (firstInit) {
             weatherListArrayList.add(weatherList);
+
+        } else {
+            for (int i = 0; i < weatherListArrayList.size(); i++) {
+                if (weatherListArrayList.get(i).getName().equalsIgnoreCase(weatherList.getName())) {
+                    Toast.makeText(context, "This city already exist in list", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+            if (adapter != null) {
+                weatherListArrayList.add(weatherList);
+                adapter.getDataList().add(weatherList);
+                adapter.notifyDataSetChanged();
+                //adapter.notifyItemRangeChanged(0,);
+            }
         }
-
         SharedPreferences.Editor editor = preferences.edit();
-        //  editor.putInt("Status_size", listSize+1);
-//        for (int i = 0; i < weatherListArrayList.size(); i++) {
-//            editor.remove("Status_" + i);
-//            Gson gson = new Gson();
-//            editor.putString("Status_" + i, gson.toJson(weatherListArrayList.get(i)));
-//        }
-//        editor.commit();
-
         Gson gson = new Gson();
         String list = gson.toJson(weatherListArrayList);
 
         editor.putString("Status_list", list);
         editor.apply();
+
     }
 
-    public void removeObjectFromPreferences(Context context, WeatherList weatherList,int position) {
-//        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-//        ArrayList<WeatherList> weatherListArrayList = new ArrayList<>();
-//        int listSize = preferences.getInt("Status_size", 0);
-//        for (int i = 0; i < listSize; i++) {
-//            Gson gson = new Gson();
-//            weatherListArrayList.add(gson.fromJson(preferences.getString("Status_" + i, null), WeatherList.class));
-//        }
-//
-//        if (weatherListArrayList.contains(weatherList)) {
-//            weatherListArrayList.remove(weatherList);
-//
-//            SharedPreferences.Editor editor = preferences.edit();
-//            editor.putInt("Status_size", weatherListArrayList.size());
-//            for (int i = 0; i < weatherListArrayList.size(); i++) {
-//                editor.remove("Status_" + i);
-//                Gson gson = new Gson();
-//                editor.putString("Status_" + i, gson.toJson(weatherListArrayList.get(i)));
-//            }
-//            editor.commit();
-//        }
+    public void removeObjectFromPreferences(Context context, int position) {
+
         ArrayList<WeatherList> weatherListArrayList = getWeatherListFromPrefernces(context);
         if (weatherListArrayList.size() > 0) {
 
-                weatherListArrayList.remove(position);
+            weatherListArrayList.remove(position);
 
 
-                SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                Gson gson = new Gson();
-                String list = gson.toJson(weatherListArrayList);
+            SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            Gson gson = new Gson();
+            String list = gson.toJson(weatherListArrayList);
 
-                editor.putString("Status_list", list);
-                editor.apply();
-            }
+            editor.putString("Status_list", list);
+            editor.apply();
+        }
 
     }
 
