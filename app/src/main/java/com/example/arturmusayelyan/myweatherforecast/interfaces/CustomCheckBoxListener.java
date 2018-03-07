@@ -1,4 +1,4 @@
-package com.example.arturmusayelyan.myweatherforecast.views;
+package com.example.arturmusayelyan.myweatherforecast.interfaces;
 
 import com.example.arturmusayelyan.myweatherforecast.models.CustomCity;
 

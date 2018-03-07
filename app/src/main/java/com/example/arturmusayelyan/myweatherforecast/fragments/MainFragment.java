@@ -4,12 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,25 +18,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.RecyclerCityAdapter;
+import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
 import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
+import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
 import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
-import com.example.arturmusayelyan.myweatherforecast.utils.SimpleItemTouchHelperCallback;
+import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
+import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
 import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
 
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,7 +54,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     private ApiInterface apiInterface;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SearchView searchView;
-
     private TextView toolbarTitle;
     private ImageView toolbarImage;
     private Loader loader;
@@ -83,9 +81,48 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         init(view);
-        // Log.d("Preferences",AllCitiesController.getInstance().getAllCitiesList().get(0).toString());
-        //doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
-        doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
+        //  doGroupCityCall(true, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
+        if (NetworkController.isNetworkAvailable(getActivity())) {
+            do20CitiesGroupCall(true);
+        } else {
+            initRecCityAdapter(ShPrefController.getAllObjects(getActivity()));
+            Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void do20CitiesGroupCall(final boolean isAdapterFirstInit) {
+        loader.start();
+        WebServiceManager.do20CitiesGroupCall().enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Call<Example> call, Response<Example> response) {
+                ShPrefController.removeAll(getActivity());
+                List<WeatherList> dataList = response.body().getList();
+                for (int i = 0; i < dataList.size(); i++) {
+                    ShPrefController.addObject(getActivity(), dataList.get(i));
+                }
+                Log.d("Art", ShPrefController.getAllObjects(getActivity()).size() + "");
+                if (isAdapterFirstInit) {
+                    initRecCityAdapter(ShPrefController.getAllObjects(getActivity()));
+                    loader.end();
+                } else {
+                    adapter.notifyItemRangeChanged(0, ShPrefController.getAllObjects(getActivity()).size());
+                    loader.end();
+                }
+
+                if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Example> call, Throwable t) {
+                loader.end();
+                initRecCityAdapter(ShPrefController.getAllObjects(getActivity()));
+                Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void init(View view) {
@@ -111,7 +148,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         });
 
 //        searchView.animate().x().y().setDuration().alpha().scaleX().start();
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -143,32 +179,30 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loader.start();
-                doGroupCityCall(false, AllCitiesController.getInstance().createGroupCitiesQUERY(getActivity()));
+                do20CitiesGroupCall(false);
             }
         });
-        layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        int colorResourceName = getResources().getIdentifier("blue", "color", getActivity().getPackageName());
-        Toasty.Config.getInstance().setTextColor(ContextCompat.getColor(getActivity(), colorResourceName)).apply();
+//        layoutManager = new LinearLayoutManager(getActivity());
+//        recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.setHasFixedSize(true);
+//        int colorResourceName = getResources().getIdentifier("blue", "color", getActivity().getPackageName());
+//        Toasty.Config.getInstance().setTextColor(ContextCompat.getColor(getActivity(), colorResourceName)).apply();
 
         apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
     }
 
 
     public void initRecCityAdapter(List<WeatherList> dataList) {
+        Log.d("Art", dataList.size() + "");
         adapter = new RecyclerCityAdapter(getActivity(), dataList);
         adapter.setRecyclerItemClickListener(this);
         recyclerView.setAdapter(adapter);
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter, getActivity());
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void doGroupCityCall(final boolean fistTime, String query) {
         loader.start();
-        Call<Example> call = apiInterface.getGroupeCitesWeatherListByQuery(query);
+        Call<Example> call = apiInterface.getGroupCitesWeatherListByQuery(query);
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
@@ -180,10 +214,10 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
 
                         AllCitiesController.getInstance().clearShPrferences(getActivity());
                         for (int i = 0; i < dataList.size(); i++) {
-                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(i),null,true);
+                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), dataList.get(i), null, true);
                         }
                         initRecCityAdapter(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()));
-                       // initRecCityAdapter(dataList);
+                        // initRecCityAdapter(dataList);
                         Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
                     } else {
                         adapter.notifyItemRangeChanged(0, adapter.getDataList().size());
@@ -208,9 +242,43 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
         });
     }
 
+    private void doCityWeatherCall(final String cityName){
+        if(NetworkController.isNetworkAvailable(getActivity())) {
+            loader.start();
+            WebServiceManager.doCityWeatherCallByName(cityName).enqueue(new Callback<SeparateCity>() {
+                @Override
+                public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
+                    WebServiceManager.doCityWeatherCallByName(cityName).enqueue(new Callback<SeparateCity>() {
+                        @Override
+                        public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<SeparateCity> call, Throwable t) {
+                            Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+                            toolbarImage.setVisibility(View.VISIBLE);
+                            toolbarTitle.setVisibility(View.VISIBLE);
+                            loader.end();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Call<SeparateCity> call, Throwable t) {
+                    Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
+                    toolbarImage.setVisibility(View.VISIBLE);
+                    toolbarTitle.setVisibility(View.VISIBLE);
+                    loader.end();
+                }
+            });
+        }else {
+            Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void doSeparateCityCall(final String cityName) {
         loader.start();
-        //       final String[] tempature = {null};
         Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
         call.enqueue(new Callback<SeparateCity>() {
             @Override
@@ -218,22 +286,15 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                 SeparateCity separateCity = response.body();
                 if (separateCity != null && (separateCity.getList().size() > 0)) {
 
-                    Call<Example> call1 = apiInterface.getGroupeCitesWeatherListByQuery(String.valueOf(separateCity.getList().get(0).getId()));
+                    Call<Example> call1 = apiInterface.getGroupCitesWeatherListByQuery(String.valueOf(separateCity.getList().get(0).getId()));
                     call1.enqueue(new Callback<Example>() {
                         @Override
                         public void onResponse(Call<Example> call, Response<Example> response) {
                             List<WeatherList> dataList = response.body().getList();
                             WeatherList cityWeather = dataList.get(0);
-                            AllCitiesController.getInstance().addObjectToPreferences(getActivity(), cityWeather,adapter,false);
-                            Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size() + "");
 
-//                            List<WeatherList> adapterDataList=adapter.getDataList();
-//                            adapterDataList.add(cityWeather);
- //                           Log.d("ShPreferences",adapterDataList.size()+"");
-//                            adapter.notifyItemInserted(adapterDataList.size()-1);
-                           // adapter.notifyItemRangeChanged(0,adapterDataList.size());
-                           // adapter.notifyItemInserted(AllCitiesController.getInstance().getWeatherListFromPrefernces(getActivity()).size()-1);
-                            recyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
+
+                            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
                             toolbarImage.setVisibility(View.VISIBLE);
                             toolbarTitle.setVisibility(View.VISIBLE);
                             loader.end();
@@ -245,7 +306,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                         }
                     });
 
-                }else {
+                } else {
                     Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);

@@ -29,22 +29,9 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     private List<WeatherList> dataList;
     private RecyclerItemClickListener recyclerItemClickListener;
     private Context context;
-//    ItemTouchHelper.SimpleCallback simpleCallback=new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT|ItemTouchHelper.LEFT) {
-//        @Override
-//        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-//            return false;
-//        }
-//
-//        @Override
-//        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-//
-//        }
-//    };
-
 
     public RecyclerCityAdapter(Context context, List<WeatherList> dataList) {
-        this.dataList = dataList;
-        //dataList=AllCitiesController.getInstance().getAllCitiesList();
+       this.dataList=dataList;
         this.context = context;
     }
 
@@ -59,47 +46,32 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
         WeatherList currentWeather = dataList.get(position);
-        // WeatherList currentWeather = AllCitiesController.getInstance().getAllCitiesList().get(position);
+        Log.d("Art",currentWeather.toString());
         String currentCityName = currentWeather.getName();
         if (currentCityName.length() > 10) {
             holder.cityTv.setTextSize(16);
         }
         holder.cityTv.setText(currentCityName);
-        holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
-
-
-        String icon = dataList.get(position).getWeather().get(0).getIcon();
-        // String icon = AllCitiesController.getInstance().getAllCitiesList().get(position).getWeather().get(0).getIcon();
-        downloadImage(icon, position, holder.weatherIcon, currentWeather);
-
-        // holder.checkBox.setFavorite(dataList.get(position).isFavorite());
-
-//        if (FavoritesController.getInstance().getFavoriteCitesIdList().indexOf(String.valueOf(AllCitiesController.getInstance().getAllCitiesList().get(position).getId())) >= 0) {
-//            holder.checkBox.setFavorite(true);
-//        } else {
-//            holder.checkBox.setFavorite(false);
-//        }
-
-        //holder.checkBox.setFavorite(AllCitiesController.getInstance().getAllCitiesList().get(position).isFavorite());
+        holder.temperatureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
+        String icon = currentWeather.getWeather().get(0).getIcon();
+        downloadImage(icon, holder.weatherIcon);
 
         holder.checkBox.setChecked(currentWeather.isFavorite());
         //holder.checkBox.setFavorite(AllCitiesController.getInstance().getWeatherListFromPrefernces(context).get(position).isFavorite());
     }
 
 
-    private void downloadImage(String icon, int position, ImageView weatherIcon, WeatherList weatherList) {
+    private void downloadImage(String icon, ImageView weatherIcon) {
         Glide.with(context).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
-        weatherList.setIcon(icon);
-        weatherList.setPosition(position);
     }
 
 
     @Override
     public int getItemCount() {
+       // Log.d("Art",dataList.size()+"");
         return dataList.size();
-        // return AllCitiesController.getInstance().getAllCitiesList().size();
     }
 
     public List<WeatherList> getDataList() {
@@ -107,48 +79,38 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView cityTv, tempratureTv;
-        private ImageView weatherIcon, addNewRow;
+        private TextView cityTv, temperatureTv;
+        private ImageView weatherIcon;
         private CheckBox checkBox;
 
         public MyViewHolder(final View itemView) {
             super(itemView);
             cityTv = itemView.findViewById(R.id.row_city_tv);
-            tempratureTv = itemView.findViewById(R.id.row_temp_tv);
+            temperatureTv = itemView.findViewById(R.id.row_temp_tv);
             weatherIcon = itemView.findViewById(R.id.row_city_image);
-            addNewRow = itemView.findViewById(R.id.add_new_row);
             checkBox = itemView.findViewById(R.id.custom_check_box);
             itemView.setOnClickListener(this);
-
-
             itemView.setOnTouchListener(new OnSwipeTouchListener(context) {
                 @Override
                 public void onSwipeLeft() {
-                    //super.onSwipeLeft();
                     Toast.makeText(context, "Left worked", Toast.LENGTH_SHORT).show();
                     dataList.remove(dataList.get(getAdapterPosition()));
 
-                    AllCitiesController.getInstance().removeObjectFromPreferences(context, getAdapterPosition());
-                    Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(context).size() + "");
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }
 
                 @Override
                 public void onSwipeRight() {
-                    //super.onSwipeRight();
                     Toast.makeText(context, "Right worked", Toast.LENGTH_SHORT).show();
                     dataList.remove(dataList.get(getAdapterPosition()));
 
-                    AllCitiesController.getInstance().removeObjectFromPreferences(context, getAdapterPosition());
-                    Log.d("ShPreferences", AllCitiesController.getInstance().getWeatherListFromPrefernces(context).size() + "");
                     notifyItemRemoved(getAdapterPosition());
                     notifyItemRangeChanged(getAdapterPosition(), dataList.size());
                 }
 
                 @Override
                 public void onClick() {
-                    //  super.onClick();
                     recyclerItemClickListener.onItemClick(itemView, dataList.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
