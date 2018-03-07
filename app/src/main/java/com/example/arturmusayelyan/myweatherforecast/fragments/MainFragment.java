@@ -252,6 +252,11 @@ public class MainFragment extends Fragment implements View.OnClickListener, Recy
                         @Override
                         public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
 
+                            ((MainActivity)getActivity()).pushFragment(CityFragment.newInstance(response.body().getList().get(0).getName()),true);
+                            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+                            toolbarImage.setVisibility(View.VISIBLE);
+                            toolbarTitle.setVisibility(View.VISIBLE);
+                            loader.end();
                         }
 
                         @Override
