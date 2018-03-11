@@ -15,18 +15,18 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsComunicateListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsCommunicatorListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.FavoriteCitiesAdapter;
-import com.example.arturmusayelyan.myweatherforecast.dataController.FavoritesController;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
+import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
 import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,16 +36,15 @@ import retrofit2.Response;
  * Created by artur.musayelyan on 23/02/2018.
  */
 
-public class FavoritesFragment extends Fragment implements RecyclerItemClickListener {
+public class FavoritesFragment extends Fragment implements FavoriteFragmentItemClickListener {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private Loader loader;
     private Context context;
-    private ApiInterface apiInterface;
     private FavoriteCitiesAdapter adapter;
     private java.util.List<WeatherList> dataList;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private FragmentsComunicateListener fragmentsComunicateListener;
+    private FragmentsCommunicatorListener fragmentsCommunicatorListener;
 
     public FavoritesFragment() {
 
@@ -61,8 +60,8 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         return fragment;
     }
 
-    public void setFragmentsComunicateListener(FragmentsComunicateListener fragmentsComunicateListener) {
-        this.fragmentsComunicateListener = fragmentsComunicateListener;
+    public void setFragmentsCommunicatorListener(FragmentsCommunicatorListener fragmentsCommunicatorListener) {
+        this.fragmentsCommunicatorListener = fragmentsCommunicatorListener;
     }
 
     @Nullable
@@ -75,7 +74,7 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         init(view);
-        doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY(), true);
+        doGroupCitiesCallByCustomNames(true);
     }
 
     private void init(View view) {
@@ -85,36 +84,30 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
-        apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
 
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                doGroupCitiesCallByCustomNames(FavoritesController.getInstance().nameToCitesIdQUERY(), false);
+                doGroupCitiesCallByCustomNames(false);
             }
         });
     }
 
 
-    private void doGroupCitiesCallByCustomNames(String query, final boolean firstTime) {
+    private void doGroupCitiesCallByCustomNames(final boolean isAdapterFirstInit) {
         loader.start();
-
-        Call<Example> call = apiInterface.getFavoriteCitesWeatherList(query);
-        call.enqueue(new Callback<Example>() {
+        String queryByCitiesId = ShPrefController.createQueryForCall(getActivity());
+        Log.d("Query", queryByCitiesId);
+        WebServiceManager.doCitiesGroupCallByIds(queryByCitiesId).enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Call<Example> call, Response<Example> response) {
-                Log.d("Art", response.body().getList().toString());
-
-                dataList = response.body().getList();
-                if (dataList != null && !dataList.isEmpty()) {
-                    if (firstTime) {
-                        initFavoriteCitesAdapter((ArrayList<WeatherList>) dataList);
-                    } else {
-                        adapter.notifyItemRangeChanged(0, dataList.size());
-                    }
+                List<WeatherList> dataList = response.body().getList();
+                if (isAdapterFirstInit) {
+                    initFavoriteCitesAdapter((ArrayList<WeatherList>) dataList);
+                } else {
+                    adapter.notifyItemRangeChanged(0, dataList.size());
                 }
-
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -124,39 +117,37 @@ public class FavoritesFragment extends Fragment implements RecyclerItemClickList
             @Override
             public void onFailure(Call<Example> call, Throwable t) {
                 Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_LONG).show();
-
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
-
             }
         });
     }
 
     private void initFavoriteCitesAdapter(ArrayList<WeatherList> favoriteCitiesList) {
         adapter = new FavoriteCitiesAdapter(getActivity(), favoriteCitiesList);
-        adapter.setRecyclerItemClickListener(this);
+        adapter.setFavoriteFragmentItemClickListener(this);
         recyclerView.setAdapter(adapter);
     }
 
 
     @Override
-    public void onItemClick(View view, WeatherList weatherList, int position) {
+    public void onFavoriteFragmentItemClick(View view, WeatherList weatherList, int position) {
         switch (view.getId()) {
             case R.id.custom_check_box:
-                FavoritesController.getInstance().removeID(String.valueOf(weatherList.getId()));
-                // MainFragment.adapter.notifyItemRangeChanged(0, MainFragment.dataList.size());
-                fragmentsComunicateListener.onFragmentClick(view, position);
 
+                Toast.makeText(getActivity(), (weatherList.getName() + " " + R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
                 adapter.getList().remove(position);
-                if (adapter.getList().isEmpty()) {
-                    ((MainActivity) getActivity()).onBackPressed();
-                    return;
-                }
-                Log.d("Art", FavoritesController.getInstance().favoriteCitesIdListInfo());
                 adapter.notifyItemRemoved(position);
-                adapter.notifyItemRangeChanged(position, FavoritesController.getInstance().getFavoriteCitesIdList().size());
+                adapter.notifyItemRangeChanged(0, adapter.getList().size());
+                if (adapter.getList().size() <= 0) {
+                    ((MainActivity) getActivity()).backToHomeScreen();
+                }
+                ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+
+                //harcnel
+                //fragmentsCommunicatorListener.onFragmentsCommunicateClick(view,weatherList);
                 break;
             default:
                 ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true);

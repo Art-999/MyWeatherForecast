@@ -5,4 +5,5 @@
     <string name="check_connection">Check your Internet Connection</string>
     <string name="type_correct">Type city name in correct</string>
     <string name="empty_favorites">At first add your favorite cities</string>
+    <string name="removed_from_favorites">removed from favorites</string>
 </resources>

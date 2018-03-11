@@ -15,8 +15,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
+import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.MainFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.OnSwipeTouchListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.List;
@@ -27,16 +29,16 @@ import java.util.List;
 
 public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapter.MyViewHolder> {
     private List<WeatherList> dataList;
-    private RecyclerItemClickListener recyclerItemClickListener;
+    private MainFragmentItemClickListener mainFragmentItemClickListener;
     private Context context;
 
     public RecyclerCityAdapter(Context context, List<WeatherList> dataList) {
-       this.dataList=dataList;
+        this.dataList = dataList;
         this.context = context;
     }
 
-    public void setRecyclerItemClickListener(RecyclerItemClickListener itemClickListener) {
-        this.recyclerItemClickListener = itemClickListener;
+    public void setRecyclerItemClickListener(MainFragmentItemClickListener mainFragmentItemClickListener) {
+        this.mainFragmentItemClickListener = mainFragmentItemClickListener;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         WeatherList currentWeather = dataList.get(position);
-        Log.d("Art",currentWeather.toString());
+        Log.d("Art", currentWeather.toString());
         String currentCityName = currentWeather.getName();
         if (currentCityName.length() > 10) {
             holder.cityTv.setTextSize(16);
@@ -70,7 +72,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
     @Override
     public int getItemCount() {
-       // Log.d("Art",dataList.size()+"");
+        // Log.d("Art",dataList.size()+"");
         return dataList.size();
     }
 
@@ -90,39 +92,28 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
             weatherIcon = itemView.findViewById(R.id.row_city_image);
             checkBox = itemView.findViewById(R.id.custom_check_box);
             itemView.setOnClickListener(this);
-            itemView.setOnTouchListener(new OnSwipeTouchListener(context) {
-                @Override
-                public void onSwipeLeft() {
-                    Toast.makeText(context, "Left worked", Toast.LENGTH_SHORT).show();
-                    dataList.remove(dataList.get(getAdapterPosition()));
-
-                    notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
-                }
-
-                @Override
-                public void onSwipeRight() {
-                    Toast.makeText(context, "Right worked", Toast.LENGTH_SHORT).show();
-                    dataList.remove(dataList.get(getAdapterPosition()));
-
-                    notifyItemRemoved(getAdapterPosition());
-                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
-                }
-
-                @Override
-                public void onClick() {
-                    recyclerItemClickListener.onItemClick(itemView, dataList.get(getAdapterPosition()), getAdapterPosition());
-                }
-            });
-
-//            checkBox.setOnClickListener(new View.OnClickListener() {
+//            itemView.setOnTouchListener(new OnSwipeTouchListener(context) {
 //                @Override
-//                public void onClick(View v) {
-//                    if (checkBox.isChecked()) {
+//                public void onSwipeLeft() {
+//                    Toast.makeText(context, "Left worked", Toast.LENGTH_SHORT).show();
+//                    dataList.remove(dataList.get(getAdapterPosition()));
 //
-//                    } else {
+//                    notifyItemRemoved(getAdapterPosition());
+//                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
+//                }
 //
-//                    }
+//                @Override
+//                public void onSwipeRight() {
+//                    Toast.makeText(context, "Right worked", Toast.LENGTH_SHORT).show();
+//                    dataList.remove(dataList.get(getAdapterPosition()));
+//
+//                    notifyItemRemoved(getAdapterPosition());
+//                    notifyItemRangeChanged(getAdapterPosition(), dataList.size());
+//                }
+//
+//                @Override
+//                public void onClick() {
+//                    mainFragmentItemClickListener.onMainFragmentClick(itemView, dataList.get(getAdapterPosition()));
 //                }
 //            });
 
@@ -130,11 +121,15 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (buttonView.isPressed()) {
+                        WeatherList pressedItemWeatherList=dataList.get(getAdapterPosition());
                         if (isChecked) {
-                            AllCitiesController.getInstance().getWeatherListFromPrefernces(context).get(getAdapterPosition()).setFavorite(true);
+                            pressedItemWeatherList.setFavorite(true);
+                            //ShPrefController.addFavorites(context, dataList.get(getAdapterPosition()).getName());
                         } else {
-                            AllCitiesController.getInstance().getWeatherListFromPrefernces(context).get(getAdapterPosition()).setFavorite(false);
+                            pressedItemWeatherList.setFavorite(false);
+                           // ShPrefController.removeFavorite(context, dataList.get(getAdapterPosition()).getName());
                         }
+                        mainFragmentItemClickListener.onMainFragmentClick(buttonView,pressedItemWeatherList);
                     }
                 }
             });
@@ -143,7 +138,7 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
 
         @Override
         public void onClick(View view) {
-            recyclerItemClickListener.onItemClick(view, AllCitiesController.getInstance().getAllCitiesList().get(getAdapterPosition()), getAdapterPosition());
+            mainFragmentItemClickListener.onMainFragmentClick(itemView, dataList.get(getAdapterPosition()));
         }
 
     }

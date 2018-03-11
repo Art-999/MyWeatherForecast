@@ -7,12 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.RecyclerItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.ArrayList;
@@ -22,17 +23,17 @@ import java.util.ArrayList;
  */
 
 public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAdapter.MyViewHolder> {
-    private ArrayList<WeatherList> favoriteCitiesList;
+    private ArrayList<WeatherList> favoriteCitiesWeatherList;
     private Context context;
-    private RecyclerItemClickListener recyclerItemClickListener;
+    private FavoriteFragmentItemClickListener favoriteFragmentItemClickListener;
 
     public FavoriteCitiesAdapter(FragmentActivity context, ArrayList<WeatherList> favoriteCitiesList) {
         this.context = context;
-        this.favoriteCitiesList = favoriteCitiesList;
+        this.favoriteCitiesWeatherList = favoriteCitiesList;
     }
 
-    public void setRecyclerItemClickListener(RecyclerItemClickListener itemClickListener) {
-        this.recyclerItemClickListener = itemClickListener;
+    public void setFavoriteFragmentItemClickListener(FavoriteFragmentItemClickListener favoriteFragmentItemClickListener) {
+        this.favoriteFragmentItemClickListener = favoriteFragmentItemClickListener;
     }
 
     private void downloadImage(String icon, ImageView weatherIcon) {
@@ -47,52 +48,46 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        WeatherList currentWeather = favoriteCitiesList.get(position);
+        WeatherList currentWeather = favoriteCitiesWeatherList.get(position);
 
         String currentCityName = currentWeather.getName();
         if (currentCityName.length() > 10) {
             holder.cityTv.setTextSize(16);
         }
         holder.cityTv.setText(currentCityName);
-        holder.tempratureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
+        holder.temperatureTv.setText((int) Double.parseDouble(String.valueOf(currentWeather.getMain().getTemp())) + "º C");
 
-        String icon = favoriteCitiesList.get(position).getWeather().get(0).getIcon();
+        String icon = favoriteCitiesWeatherList.get(position).getWeather().get(0).getIcon();
         downloadImage(icon, holder.weatherIcon);
 
-        // holder.checkBox.setFavorite(favoriteCitiesList.get(position).isFavorite());
+        // holder.checkBox.setFavorite(favoriteCitiesWeatherList.get(position).isFavorite());
         holder.checkBox.setChecked(true);
     }
 
 
     @Override
     public int getItemCount() {
-        return favoriteCitiesList.size();
-       // return FavoritesController.getInstance().getFavoriteCitesIdList().size();
+        return favoriteCitiesWeatherList.size();
     }
 
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView cityTv, tempratureTv;
+        private TextView cityTv, temperatureTv;
         private ImageView weatherIcon;
         private CheckBox checkBox;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             cityTv = itemView.findViewById(R.id.row_city_tv);
-            tempratureTv = itemView.findViewById(R.id.row_temp_tv);
+            temperatureTv = itemView.findViewById(R.id.row_temp_tv);
             weatherIcon = itemView.findViewById(R.id.row_city_image);
             checkBox = itemView.findViewById(R.id.custom_check_box);
             itemView.setOnClickListener(this);
-            checkBox.setOnClickListener(new View.OnClickListener() {
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
-                    recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
-
-
-                    if (checkBox.isChecked()) {
-                        //  favoriteCitiesList.get(getAdapterPosition()).setFavorite(true);
-                    } else {
-                        //favoriteCitiesList.get(getAdapterPosition()).setFavorite(false);
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(buttonView.isPressed()){
+                        favoriteFragmentItemClickListener.onFavoriteFragmentItemClick(buttonView,favoriteCitiesWeatherList.get(getAdapterPosition()),getAdapterPosition());
                     }
                 }
             });
@@ -100,12 +95,12 @@ public class FavoriteCitiesAdapter extends RecyclerView.Adapter<FavoriteCitiesAd
 
         @Override
         public void onClick(View v) {
-            recyclerItemClickListener.onItemClick(v, favoriteCitiesList.get(getAdapterPosition()), getAdapterPosition());
+            favoriteFragmentItemClickListener.onFavoriteFragmentItemClick(v, favoriteCitiesWeatherList.get(getAdapterPosition()), getAdapterPosition());
         }
     }
 
     public ArrayList<WeatherList> getList() {
-        return favoriteCitiesList;
+        return favoriteCitiesWeatherList;
     }
 
 }

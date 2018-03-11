@@ -17,30 +17,8 @@ import java.util.ArrayList;
 public class ShPrefController {
     private static final String SHARED_PREFERENCES_NAME = "sharedPreferencesName01";
     private static final String LIST_KEY = "Status_list";
+    private static final String FAVORITE_lIST_KEY = "Status_favorite_list_key";
 
-    private static ShPrefController instance = null;
-//    private static ArrayList<WeatherList> citiesGroupWeatherList;
-//
-//    private ShPrefController() {
-//            citiesGroupWeatherList = new ArrayList<>();
-//    }
-//
-//    public static ShPrefController getInstance(Context context) {
-//        if (instance == null) {
-//            instance = new ShPrefController();
-//            preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            Gson gson = new Gson();
-//            String list = gson.toJson(citiesGroupWeatherList);
-//            editor.putString(LIST_KEY, list);
-//            editor.apply();
-//        }
-//        return instance;
-//    }
-
-    public static String getSharedPreferencesName() {
-        return SHARED_PREFERENCES_NAME;
-    }
 
     /**
      * return WeatherList type arrayList from preferences
@@ -53,6 +31,18 @@ public class ShPrefController {
             Type type = new TypeToken<ArrayList<WeatherList>>() {
             }.getType();
 
+            return gson.fromJson(json, type);
+        }
+        return new ArrayList<>();
+    }
+
+    public static ArrayList<String> getAllFavoriteCities(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(FAVORITE_lIST_KEY)) {
+            Gson gson = new Gson();
+            String json = preferences.getString(FAVORITE_lIST_KEY, null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
             return gson.fromJson(json, type);
         }
         return new ArrayList<>();
@@ -73,6 +63,23 @@ public class ShPrefController {
         String list = gson.toJson(citiesGroupWeatherList);
         editor.putString(LIST_KEY, list);
         editor.apply();
+    }
+
+    public static void addFavorites(Context context, String cityName) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        ArrayList<String> favoriteCitiesList;
+        if (preferences.contains(FAVORITE_lIST_KEY)) {
+            favoriteCitiesList = getAllFavoriteCities(context);
+        } else {
+            favoriteCitiesList = new ArrayList<>();
+        }
+        favoriteCitiesList.add(cityName);
+        SharedPreferences.Editor editor = preferences.edit();
+        Gson gson = new Gson();
+        String list = gson.toJson(favoriteCitiesList);
+        editor.putString(FAVORITE_lIST_KEY, list);
+        editor.apply();
+
     }
 
     /**
@@ -99,6 +106,19 @@ public class ShPrefController {
         }
     }
 
+    public static void removeFavorite(Context context,String cityName){
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        ArrayList<String> favoriteCitiesList=getAllFavoriteCities(context);
+        if(favoriteCitiesList.contains(cityName)){
+            favoriteCitiesList.remove(cityName);
+            SharedPreferences.Editor editor = preferences.edit();
+            Gson gson = new Gson();
+            String list = gson.toJson(favoriteCitiesList);
+            editor.putString(FAVORITE_lIST_KEY, list);
+            editor.apply();
+        }
+    }
+
     public static void removeAll(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<WeatherList> citiesGroupWeatherList = getAllObjects(context);
@@ -107,6 +127,17 @@ public class ShPrefController {
         Gson gson = new Gson();
         String list = gson.toJson(citiesGroupWeatherList);
         editor.putString(LIST_KEY, list);
+        editor.apply();
+    }
+
+    public static void removeAllFavorites(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        ArrayList<String> allFavoriteCities = getAllFavoriteCities(context);
+        allFavoriteCities.clear();
+        SharedPreferences.Editor editor = preferences.edit();
+        Gson gson = new Gson();
+        String list = gson.toJson(allFavoriteCities);
+        editor.putString(FAVORITE_lIST_KEY, list);
         editor.apply();
     }
 
@@ -125,14 +156,19 @@ public class ShPrefController {
 
     public static String createQueryForCall(Context context) {
         ArrayList<WeatherList> citiesGroupWeatherList = getAllObjects(context);
+        ArrayList<String> favoriteCitiesList=getAllFavoriteCities(context);
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < citiesGroupWeatherList.size(); i++) {
-            builder.append(String.valueOf(citiesGroupWeatherList.get(i).getId()));
-            if (i != (citiesGroupWeatherList.size() - 1)) {
+            if(favoriteCitiesList.contains(citiesGroupWeatherList.get(i).getName())) {
+                builder.append(String.valueOf(citiesGroupWeatherList.get(i).getId()));
                 builder.append(",");
+//                if (i != (citiesGroupWeatherList.size() - 1)) {
+//                    builder.append(",");
+//                }
             }
         }
-        return new String(builder);
+        String result=new String(builder).substring(0,builder.length()-1);
+        return result;
 
     }
 
