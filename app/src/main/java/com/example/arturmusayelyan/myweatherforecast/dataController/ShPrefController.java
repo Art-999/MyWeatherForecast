@@ -106,10 +106,10 @@ public class ShPrefController {
         }
     }
 
-    public static void removeFavorite(Context context,String cityName){
+    public static void removeFavorite(Context context, String cityName) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        ArrayList<String> favoriteCitiesList=getAllFavoriteCities(context);
-        if(favoriteCitiesList.contains(cityName)){
+        ArrayList<String> favoriteCitiesList = getAllFavoriteCities(context);
+        if (favoriteCitiesList.contains(cityName)) {
             favoriteCitiesList.remove(cityName);
             SharedPreferences.Editor editor = preferences.edit();
             Gson gson = new Gson();
@@ -156,10 +156,10 @@ public class ShPrefController {
 
     public static String createQueryForCall(Context context) {
         ArrayList<WeatherList> citiesGroupWeatherList = getAllObjects(context);
-        ArrayList<String> favoriteCitiesList=getAllFavoriteCities(context);
+        ArrayList<String> favoriteCitiesList = getAllFavoriteCities(context);
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < citiesGroupWeatherList.size(); i++) {
-            if(favoriteCitiesList.contains(citiesGroupWeatherList.get(i).getName())) {
+            if (favoriteCitiesList.contains(citiesGroupWeatherList.get(i).getName())) {
                 builder.append(String.valueOf(citiesGroupWeatherList.get(i).getId()));
                 builder.append(",");
 //                if (i != (citiesGroupWeatherList.size() - 1)) {
@@ -167,9 +167,20 @@ public class ShPrefController {
 //                }
             }
         }
-        String result=new String(builder).substring(0,builder.length()-1);
+        String result = new String(builder).substring(0, builder.length() - 1);
         return result;
 
+    }
+
+    public static String createQueryByFavorites(Context context) {
+        ArrayList<String> favoriteCitiesList = getAllFavoriteCities(context);
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < favoriteCitiesList.size(); i++) {
+            builder.append(String.valueOf(favoriteCitiesList.get(i)));
+            builder.append(",");
+        }
+        String result = new String(builder).substring(0, builder.length() - 1);
+        return result;
     }
 
 

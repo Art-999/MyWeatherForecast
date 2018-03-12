@@ -100,6 +100,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
     private void doGroupCitiesCallByCustomNames(final boolean isAdapterFirstInit) {
         loader.start();
         String queryByCitiesId = ShPrefController.createQueryForCall(getActivity());
+        //String queryByCitiesId = ShPrefController.createQueryByFavorites(getActivity()); pordzel es dzevov anel
         Log.d("Query", queryByCitiesId);
         WebServiceManager.doCitiesGroupCallByIds(queryByCitiesId).enqueue(new Callback<Example>() {
             @Override
