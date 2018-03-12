@@ -1,8 +1,10 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +28,6 @@ import com.example.arturmusayelyan.myweatherforecast.interfaces.MainFragmentItem
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
 import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
 import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
 import com.example.arturmusayelyan.myweatherforecast.views.Loader;
@@ -53,6 +54,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
     private ImageView toolbarImage;
     private Loader loader;
     private ImageView slaqButton;
+    private FavoritesFragment favoritesFragment;
 
 
     public MainFragment() {
@@ -65,6 +67,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Nullable
     @Override
@@ -80,10 +83,25 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
             do20CitiesGroupCall(true);
         } else {
             initRecCityAdapter(syncFavorite(ShPrefController.getAllObjects(getActivity())));
-            Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+            Snackbar snackbar=Snackbar.make(view,getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_LONG);
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    do20CitiesGroupCall(true);
+                }
+            });
+            snackbar.setActionTextColor(Color.RED);
+            View snackBarView=snackbar.getView();
+            TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            snackBarTextView.setTextColor(Color.YELLOW);
+            snackbar.show();
         }
     }
 
+    public void upDateData() {
+        do20CitiesGroupCall(false);
+    }
 
     private void do20CitiesGroupCall(final boolean isAdapterFirstInit) {
         loader.start();
@@ -92,11 +110,12 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
             public void onResponse(Call<Example> call, Response<Example> response) {
                 final List<WeatherList> dataList = response.body().getList();
                 if (isAdapterFirstInit) {
-                    initRecCityAdapter(syncFavorite(dataList));
+                    List<WeatherList> dataListForAdapter = syncFavorite(dataList);
+                    initRecCityAdapter(dataListForAdapter);
                     upDateShPrefData(dataList);
-
                 } else {
-                    adapter.notifyItemRangeChanged(0, dataList.size());
+                    List<WeatherList> dataListForAdapter = syncFavorite(dataList);
+                    adapter.notifyItemRangeChanged(0, dataListForAdapter.size());
                 }
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
@@ -114,7 +133,21 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
             public void onFailure(Call<Example> call, Throwable t) {
                 loader.end();
                 initRecCityAdapter(ShPrefController.getAllObjects(getActivity()));
-                Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
+
+                    Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+                    snackbar.setAction("RETRY", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            do20CitiesGroupCall(false);
+                        }
+                    });
+                    snackbar.setActionTextColor(Color.RED);
+                    View snackBarView=snackbar.getView();
+                    TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                    snackBarTextView.setTextColor(Color.YELLOW);
+                    snackbar.show();
+
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -128,14 +161,21 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
         for (int i = 0; i < dataList.size(); i++) {
             if (favoriteCitiesList.contains(dataList.get(i).getName())) {
                 dataList.get(i).setFavorite(true);
+                if (adapter != null) {
+                    adapter.getDataList().get(i).setFavorite(true);
+                }
+
             } else {
                 dataList.get(i).setFavorite(false);
+                if (adapter != null) {
+                    adapter.getDataList().get(i).setFavorite(false);
+                }
+
             }
         }
 
         return dataList;
     }
-
 
 
     private void upDateShPrefData(final List<WeatherList> dataList) {
@@ -151,6 +191,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
     }
 
     private void init(View view) {
+        favoritesFragment = FavoritesFragment.newInstance();
+        favoritesFragment.setFragmentsCommunicatorListener(this);
         recyclerView = view.findViewById(R.id.recycler_view);
         loader = view.findViewById(R.id.custom_loader);
         slaqButton = view.findViewById(R.id.slaq_button);
@@ -177,7 +219,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
             @Override
             public boolean onQueryTextSubmit(String query) {
                 UIUtil.hideKeyboard(getActivity());
-               // doSeparateCityCall(query);
+                // doSeparateCityCall(query);
                 doCityWeatherCallBySearchedQuery(query);
                 searchView.onActionViewCollapsed();
                 return false;
@@ -219,23 +261,22 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void doCityWeatherCallBySearchedQuery(String query){
-        //loader.start(); //kareliya es pahe mi qich popoxel
+    private void doCityWeatherCallBySearchedQuery(String query) {
+        loader.start(); //kareliya es pahe mi qich popoxel
         WebServiceManager.doCityWeatherCallByName(query).enqueue(new Callback<SeparateCity>() {
             @Override
             public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
-                SeparateCity separateCity=response.body();
-                if(separateCity!=null && ((separateCity.getList().size() > 0))){
+                SeparateCity separateCity = response.body();
+                if (separateCity != null && ((separateCity.getList().size() > 0))) {
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);
-                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(separateCity.getList().get(0).getName()), true);
-                   // loader.end();
-                }
-                else {
+                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(separateCity.getList().get(0).getName()), true,MainActivity.CITY_FRAGMENT_TAG);
+                     loader.end();
+                } else {
                     Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);
-                    //loader.end();
+                    loader.end();
                 }
             }
 
@@ -244,26 +285,43 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
                 toolbarImage.setVisibility(View.VISIBLE);
                 toolbarTitle.setVisibility(View.VISIBLE);
-                //loader.end();
+                loader.end();
             }
         });
     }
-
-
 
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-                List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
-                if (!favoriteCitiesList.isEmpty()) {
-                    ((MainActivity) getActivity()).pushFragment(FavoritesFragment.newInstance(), true);
-                    return;
-                }
-                Toast.makeText(getActivity(), R.string.empty_favorites, Toast.LENGTH_SHORT).show();
+               slaqButtonWork();
                 break;
         }
+    }
+    private void slaqButtonWork(){
+        List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
+        if (!favoriteCitiesList.isEmpty()) {
+            if(NetworkController.isNetworkAvailable(getActivity())) {
+                ((MainActivity) getActivity()).pushFragment(favoritesFragment, true, MainActivity.FAVORITE_FRAGMENT_TAG);
+            }
+            else {
+                Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+                snackbar.setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                       slaqButtonWork();
+                    }
+                });
+                snackbar.setActionTextColor(Color.RED);
+                View snackBarView=snackbar.getView();
+                TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                snackBarTextView.setTextColor(Color.YELLOW);
+                snackbar.show();
+            }
+            return;
+        }
+        Toast.makeText(getActivity(), R.string.empty_favorites, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -278,9 +336,27 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 }
                 break;
             default:
-                UIUtil.hideKeyboard(getActivity());
-                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true);
+               mainItemClick(weatherList);
                 break;
+        }
+    }
+    private void mainItemClick(final WeatherList weatherList){
+        UIUtil.hideKeyboard(getActivity());
+        if(NetworkController.isNetworkAvailable(getActivity())){
+            ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true,MainActivity.CITY_FRAGMENT_TAG);
+        }else {
+            Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mainItemClick(weatherList);
+                }
+            });
+            snackbar.setActionTextColor(Color.RED);
+            View snackBarView=snackbar.getView();
+            TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            snackBarTextView.setTextColor(Color.YELLOW);
+            snackbar.show();
         }
 
     }
@@ -288,8 +364,13 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
 
     @Override
     public void onFragmentsCommunicateClick(View view, WeatherList weatherList) {
+        //prosto pakaca
+        // Toast.makeText(getActivity(), "Worked", Toast.LENGTH_SHORT).show();
 
-        //harc chi ashxatum
-        Toast.makeText(getActivity(), "Worked", Toast.LENGTH_SHORT).show();
+
+    }
+
+    public  Loader getLoader(){
+        return loader;
     }
 }

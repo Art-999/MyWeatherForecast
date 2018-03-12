@@ -10,15 +10,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.dataController.AllCitiesController;
-import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
 import com.example.arturmusayelyan.myweatherforecast.interfaces.MainFragmentItemClickListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.OnSwipeTouchListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 
 import java.util.List;
@@ -31,6 +26,8 @@ public class RecyclerCityAdapter extends RecyclerView.Adapter<RecyclerCityAdapte
     private List<WeatherList> dataList;
     private MainFragmentItemClickListener mainFragmentItemClickListener;
     private Context context;
+    private MyViewHolder viewHolder;
+
 
     public RecyclerCityAdapter(Context context, List<WeatherList> dataList) {
         this.dataList = dataList;

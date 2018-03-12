@@ -1,32 +1,30 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
-import android.annotation.SuppressLint;
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
+import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.models.List;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiClient;
-import com.example.arturmusayelyan.myweatherforecast.networking.ApiInterface;
+import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
 import com.example.arturmusayelyan.myweatherforecast.views.Loader;
 
 import java.text.SimpleDateFormat;
@@ -42,6 +40,7 @@ import retrofit2.Response;
  */
 
 public class CityFragment extends Fragment implements View.OnClickListener {
+    private final static String CITY_NAME_KEY = "cityName";
     private final String CLEAR_SKY = "Clear";
     private final String CLOUDS = "Clouds";
     private final String RAIN = "Rain";
@@ -54,11 +53,10 @@ public class CityFragment extends Fragment implements View.OnClickListener {
     private TextView dateTimeTV, cityNameTv, weatherDescTv, temperatureTv, windSpeedTv, humidityTv, tempMaxTv, tempMinTv;
     private ImageView slaqButton, cityMainIcon, tittleIcon;
     private String cityName;
-    private ApiInterface apiInterface;
+    private CheckBox checkBox;
     private Loader loader;
     private SwipeRefreshLayout swipeRefreshLayout;
-
-    public static String CITY_NAME;
+    public static String currentCityName;
 
     public CityFragment() {
 
@@ -66,7 +64,8 @@ public class CityFragment extends Fragment implements View.OnClickListener {
 
     public static CityFragment newInstance(String cityName) {
         Bundle bundle = new Bundle();
-        bundle.putString("cityName", cityName);
+        bundle.putString(CITY_NAME_KEY, cityName);
+
         CityFragment fragment = new CityFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -81,7 +80,6 @@ public class CityFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         init(view);
-
         final Handler someHandler = new Handler(Looper.getMainLooper());
         someHandler.postDelayed(new Runnable() {
             @Override
@@ -91,16 +89,15 @@ public class CityFragment extends Fragment implements View.OnClickListener {
             }
         }, 10);
 
-        cityName = getArguments().getString("cityName");
 
-        CITY_NAME = cityName;
-
+        currentCityName = cityName;
         cityNameTv.setText(cityName);
-
-        doSeparateCityCall(cityName);
+        doSeparateCityCallBySearchedQuery(cityName);
     }
 
     private void init(View view) {
+        cityName = getArguments().getString(CITY_NAME_KEY);
+
         dateTimeTV = view.findViewById(R.id.date_tame_tv);
         cityNameTv = view.findViewById(R.id.city_name);
         tittleIcon = view.findViewById(R.id.toolbar_image_view);
@@ -113,83 +110,97 @@ public class CityFragment extends Fragment implements View.OnClickListener {
         loader = view.findViewById(R.id.custom_loader);
         cityMainIcon = view.findViewById(R.id.city_main_icon);
         slaqButton = view.findViewById(R.id.slaq_button);
+        checkBox = view.findViewById(R.id.custom_check_box);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+
         slaqButton.setOnClickListener(this);
 
-        apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
-
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                doSeparateCityCall(cityName);
+                doSeparateCityCallBySearchedQuery(cityName);
+            }
+        });
+
+        java.util.List<String> favoritesList=ShPrefController.getAllFavoriteCities(getActivity());
+        if(favoritesList.contains(cityName)){
+            checkBox.setChecked(true);
+        }else {
+            checkBox.setChecked(false);
+        }
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isPressed()) {
+                    if (isChecked) {
+                        ShPrefController.addFavorites(getActivity(),cityName);
+                    } else {
+                        ShPrefController.removeFavorite(getActivity(),cityName);
+                    }
+                }
             }
         });
     }
 
-    private void doSeparateCityCall(final String cityName) {
+    private void doSeparateCityCallBySearchedQuery(final String query) {
         loader.start();
-        final String[] tempature = {null};
-        Call<SeparateCity> call = apiInterface.getCityWeather(cityName);
-        call.enqueue(new Callback<SeparateCity>() {
-            @SuppressLint("CheckResult")
+        MainFragment mainFragment = (MainFragment) getActivity().getSupportFragmentManager().findFragmentByTag(MainActivity.MAIN_FRAGMENT_TAG);
+        mainFragment.getLoader().end();
+        WebServiceManager.doCityWeatherCallByName(query).enqueue(new Callback<SeparateCity>() {
             @Override
             public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
-                //Log.d("Weather",response.body()+"");
                 SeparateCity separateCity = response.body();
-                if (separateCity != null && (separateCity.getList().size() > 0)) {
-                    Double temp = separateCity.getList().get(0).getMain().getTemp();
-                    int tempInt = Integer.valueOf(temp.intValue());
-                    tempature[0] = String.valueOf(tempInt);
+                List currentCity = separateCity.getList().get(0);
 
-                    String weatherDescription = separateCity.getList().get(0).getWeather().get(0).getDescription();
-                    String weatherMainDescription = separateCity.getList().get(0).getWeather().get(0).getMain();
-                    Log.d("Description", weatherDescription);
-                    Log.d("mainDescription", weatherMainDescription);
+                Double temp = currentCity.getMain().getTemp();
+                int tempInt = Integer.valueOf(temp.intValue());
+                temperatureTv.setText(tempInt + "°C");
+                String weatherDescription = currentCity.getWeather().get(0).getDescription();
+                String weatherMainDescription = currentCity.getWeather().get(0).getMain();
+                Log.d("Description", weatherDescription);
+                Log.d("mainDescription", weatherMainDescription);
 
-                    cityNameTv.setText(cityName + ", " + separateCity.getList().get(0).getSys().getCountry());
-                    weatherDescTv.setText(weatherDescription);
-                    temperatureTv.setText(tempature[0] + "°C");
-                    windSpeedTv.setText(separateCity.getList().get(0).getWind().getSpeed() + "mph");
-                    humidityTv.setText(separateCity.getList().get(0).getMain().getHumidity() + "%");
-                    tempMaxTv.setText("max: " + separateCity.getList().get(0).getMain().getTempMax() + "°C");
-                    tempMinTv.setText("min: " + separateCity.getList().get(0).getMain().getTempMin() + "°C");
-                    Log.d("Art", separateCity.getList().get(0).getWeather().get(0).getIcon());
-
-                    String weatherIcon = separateCity.getList().get(0).getWeather().get(0).getIcon();
-                    setTitleIcon(weatherIcon, tittleIcon);
-
-                    // Log.d("Icon", separateCity.getList().get(0).getWeather().get(0).getIcon() + " fragment");
-                    cityMainIcon.setImageResource(iconByDescription(weatherMainDescription, weatherIcon));
-
-                    Integer dateTime = separateCity.getList().get(0).getDt();
-                    Log.d("DataTime", dateTime + "");
-                }
-
+                windSpeedTv.setText(currentCity.getWind().getSpeed() + "mph");
+                humidityTv.setText(currentCity.getMain().getHumidity() + "%");
+                tempMaxTv.setText("max: " + currentCity.getMain().getTempMax() + "°C");
+                tempMinTv.setText("min: " + currentCity.getMain().getTempMin() + "°C");
+                String weatherIcon = currentCity.getWeather().get(0).getIcon();
+                downloadImage(weatherIcon, tittleIcon);
+                cityMainIcon.setImageResource(iconByDescription(weatherMainDescription, weatherIcon));
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
 
-                if (tempature[0] != null) {
-                    loader.end();
-                    //Toast.makeText(getActivity(), tempature[0], Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Toast.makeText(getActivity(), "Type city name in correct", Toast.LENGTH_SHORT).show();
                 loader.end();
             }
-
 
             @Override
             public void onFailure(Call<SeparateCity> call, Throwable t) {
-//                Log.d("AAAA", t.toString());
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-                //Toast.makeText(getActivity(), t.toString(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(getActivity(), "Check your Internet Connection", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.check_connection), Toast.LENGTH_SHORT).show();
                 loader.end();
+
+                Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view), getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
+                snackbar.setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        doSeparateCityCallBySearchedQuery(query);
+                    }
+                });
+                snackbar.setActionTextColor(Color.RED);
+                View snackBarView = snackbar.getView();
+                TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                snackBarTextView.setTextColor(Color.YELLOW);
+                snackbar.show();
             }
         });
+    }
+
+    private void downloadImage(String icon, ImageView weatherIcon) {
+        Glide.with(getActivity()).load("http://openweathermap.org/img/w/" + icon + ".png").into(weatherIcon);
     }
 
     private int iconByDescription(String description, String weatherIcon) {
@@ -221,27 +232,12 @@ public class CityFragment extends Fragment implements View.OnClickListener {
         return R.drawable.sun_separate_city_icon;
     }
 
-    private void setTitleIcon(String iconName, ImageView tittleIcon) {
-        Glide.with(getActivity()).load("http://openweathermap.org/img/w/" + iconName + ".png").listener(new RequestListener<Drawable>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-
-                return false;
-            }
-        }).into(tittleIcon);
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
                 // (getActivity()).onBackPressed();
-
                 ((MainActivity) getActivity()).backToHomeScreen();
                 break;
         }

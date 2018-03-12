@@ -1,9 +1,11 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,14 +14,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
-import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsCommunicatorListener;
-import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.adapters.FavoriteCitiesAdapter;
+import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FavoriteFragmentItemClickListener;
+import com.example.arturmusayelyan.myweatherforecast.interfaces.FragmentsCommunicatorListener;
 import com.example.arturmusayelyan.myweatherforecast.models.Example;
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
@@ -84,7 +86,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
 
-
+        //fragmentsCommunicatorListener = (FragmentsCommunicatorListener) getActivity();
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -116,11 +118,23 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
 
             @Override
             public void onFailure(Call<Example> call, Throwable t) {
-                Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_LONG).show();
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
+                Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+                snackbar.setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        doGroupCitiesCallByCustomNames(false);
+                    }
+                });
+                snackbar.setActionTextColor(Color.RED);
+                View snackBarView=snackbar.getView();
+                TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                snackBarTextView.setTextColor(Color.YELLOW);
+                snackbar.show();
             }
         });
     }
@@ -131,26 +145,49 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
         recyclerView.setAdapter(adapter);
     }
 
-
+public void upDateData(){
+       //adapter.getList().remove()
+    doGroupCitiesCallByCustomNames(true);
+}
     @Override
-    public void onFavoriteFragmentItemClick(View view, WeatherList weatherList, int position) {
+    public void onFavoriteFragmentItemClick(View view, final WeatherList weatherList, int position) {
         switch (view.getId()) {
             case R.id.custom_check_box:
 
-                Toast.makeText(getActivity(), (weatherList.getName() + " " + R.string.removed_from_favorites), Toast.LENGTH_SHORT).show();
+                //R.string-e chi haskanum
+                // Toast.makeText(getActivity(), (weatherList.getName() + " " + getActivity().getResources().getString(R.string.removed_from_favorites)), Toast.LENGTH_SHORT).show();
                 adapter.getList().remove(position);
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(0, adapter.getList().size());
-                if (adapter.getList().size() <= 0) {
-                    ((MainActivity) getActivity()).backToHomeScreen();
-                }
                 ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+                final Snackbar snackbar = Snackbar.make(view, weatherList.getName() + " " + getActivity().getResources().getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT);
+                snackbar.setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        adapter.getList().add(weatherList);
+                        adapter.notifyDataSetChanged();
+                        ShPrefController.addFavorites(getActivity(), weatherList.getName());
+                        //snackbar.dismiss();
+                    }
+                });
+                snackbar.addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        //System.out.println("event " + event);
+                        if(event==Snackbar.Callback.DISMISS_EVENT_TIMEOUT){
+                            if (adapter.getList().size() <= 0) {
+                                ((MainActivity) getActivity()).backToHomeScreen();
+                            }
+                        }
 
-                //harcnel
-                //fragmentsCommunicatorListener.onFragmentsCommunicateClick(view,weatherList);
+                    }
+                });
+                snackbar.show();
+
+                //fragmentsCommunicatorListener.onFragmentsCommunicateClick(view,weatherList);//ashxatuma uxaki pakaca
                 break;
             default:
-                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true);
+                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true,MainActivity.CITY_FRAGMENT_TAG);
                 break;
         }
     }
