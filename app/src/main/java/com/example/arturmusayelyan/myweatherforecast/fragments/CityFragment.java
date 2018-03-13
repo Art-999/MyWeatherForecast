@@ -53,6 +53,7 @@ public class CityFragment extends Fragment implements View.OnClickListener {
     private TextView dateTimeTV, cityNameTv, weatherDescTv, temperatureTv, windSpeedTv, humidityTv, tempMaxTv, tempMinTv;
     private ImageView slaqButton, cityMainIcon, tittleIcon;
     private String cityName;
+    private String cityId;
     private CheckBox checkBox;
     private Loader loader;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -122,21 +123,19 @@ public class CityFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        java.util.List<String> favoritesList=ShPrefController.getAllFavoriteCities(getActivity());
-        if(favoritesList.contains(cityName)){
-            checkBox.setChecked(true);
-        }else {
-            checkBox.setChecked(false);
-        }
+
+
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (buttonView.isPressed()) {
                     if (isChecked) {
-                        ShPrefController.addFavorites(getActivity(),cityName);
+                        // ShPrefController.addFavorites(getActivity(),cityName);
+                        ShPrefController.addFavoritesById(getActivity(), cityId);
                     } else {
-                        ShPrefController.removeFavorite(getActivity(),cityName);
+                        //ShPrefController.removeFavorite(getActivity(), cityName);
+                        ShPrefController.removeFavoritesById(getActivity(), cityId);
                     }
                 }
             }
@@ -170,6 +169,15 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                 cityMainIcon.setImageResource(iconByDescription(weatherMainDescription, weatherIcon));
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
+                }
+
+
+                cityId = String.valueOf(currentCity.getId());
+                java.util.List<String> favoritesList = ShPrefController.getAllFavoriteCitiesIdList(getActivity());
+                if (favoritesList.contains(cityId)) {
+                    checkBox.setChecked(true);
+                } else {
+                    checkBox.setChecked(false);
                 }
 
                 loader.end();

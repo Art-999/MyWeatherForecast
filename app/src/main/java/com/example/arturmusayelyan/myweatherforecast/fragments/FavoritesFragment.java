@@ -99,8 +99,9 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
 
     private void doGroupCitiesCallByCustomNames(final boolean isAdapterFirstInit) {
         loader.start();
-        String queryByCitiesId = ShPrefController.createQueryForCall(getActivity());
-        //String queryByCitiesId = ShPrefController.createQueryByFavorites(getActivity()); pordzel es dzevov anel
+       // String queryByCitiesId = ShPrefController.createQueryForCall(getActivity());
+        //pordzel es dzevov anel
+        String queryByCitiesId = ShPrefController.createQueryByFavorites(getActivity());
         Log.d("Query", queryByCitiesId);
         WebServiceManager.doCitiesGroupCallByIds(queryByCitiesId).enqueue(new Callback<Example>() {
             @Override
@@ -124,7 +125,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 loader.end();
-                Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+                Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view), getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
                 snackbar.setAction("RETRY", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -132,8 +133,8 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
                     }
                 });
                 snackbar.setActionTextColor(Color.RED);
-                View snackBarView=snackbar.getView();
-                TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                View snackBarView = snackbar.getView();
+                TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
                 snackBarTextView.setTextColor(Color.YELLOW);
                 snackbar.show();
             }
@@ -146,10 +147,11 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
         recyclerView.setAdapter(adapter);
     }
 
-public void upDateData(){
-       //adapter.getList().remove()
-    doGroupCitiesCallByCustomNames(true);
-}
+    public void upDateData() {
+        //adapter.getList().remove()
+        doGroupCitiesCallByCustomNames(true);
+    }
+
     @Override
     public void onFavoriteFragmentItemClick(View view, final WeatherList weatherList, int position) {
         switch (view.getId()) {
@@ -160,22 +162,23 @@ public void upDateData(){
                 adapter.getList().remove(position);
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(0, adapter.getList().size());
-                ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+                //ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+                ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
                 final Snackbar snackbar = Snackbar.make(view, weatherList.getName() + " " + getActivity().getResources().getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT);
                 snackbar.setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         adapter.getList().add(weatherList);
                         adapter.notifyDataSetChanged();
-                        ShPrefController.addFavorites(getActivity(), weatherList.getName());
-                        //snackbar.dismiss();
+                        // ShPrefController.addFavorites(getActivity(), weatherList.getName());
+                        ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
                     }
                 });
                 snackbar.addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
                         //System.out.println("event " + event);
-                        if(event==Snackbar.Callback.DISMISS_EVENT_TIMEOUT){
+                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
                             if (adapter.getList().size() <= 0) {
                                 ((MainActivity) getActivity()).backToHomeScreen();
                             }
@@ -188,7 +191,7 @@ public void upDateData(){
                 //fragmentsCommunicatorListener.onFragmentsCommunicateClick(view,weatherList);//ashxatuma uxaki pakaca
                 break;
             default:
-                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true,MainActivity.CITY_FRAGMENT_TAG);
+                ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true, MainActivity.CITY_FRAGMENT_TAG);
                 break;
         }
     }

@@ -84,7 +84,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
         } else {
             initRecCityAdapter(syncFavorite(ShPrefController.getAllObjects(getActivity())));
             //Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
-            Snackbar snackbar=Snackbar.make(view,getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_LONG);
+            Snackbar snackbar = Snackbar.make(view, getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_LONG);
             snackbar.setAction("RETRY", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -92,8 +92,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 }
             });
             snackbar.setActionTextColor(Color.RED);
-            View snackBarView=snackbar.getView();
-            TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            View snackBarView = snackbar.getView();
+            TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
             snackBarTextView.setTextColor(Color.YELLOW);
             snackbar.show();
         }
@@ -135,18 +135,18 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 initRecCityAdapter(ShPrefController.getAllObjects(getActivity()));
                 //Toast.makeText(getActivity(), R.string.check_connection, Toast.LENGTH_SHORT).show();
 
-                    Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
-                    snackbar.setAction("RETRY", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            do20CitiesGroupCall(false);
-                        }
-                    });
-                    snackbar.setActionTextColor(Color.RED);
-                    View snackBarView=snackbar.getView();
-                    TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
-                    snackBarTextView.setTextColor(Color.YELLOW);
-                    snackbar.show();
+                Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view), getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
+                snackbar.setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        do20CitiesGroupCall(false);
+                    }
+                });
+                snackbar.setActionTextColor(Color.RED);
+                View snackBarView = snackbar.getView();
+                TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                snackBarTextView.setTextColor(Color.YELLOW);
+                snackbar.show();
 
                 if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
@@ -156,10 +156,11 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
     }
 
     private List<WeatherList> syncFavorite(List<WeatherList> dataList) {
-        List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
+       // List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
+        List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCitiesIdList(getActivity());
         Log.d("Favorite", favoriteCitiesList.toString());
         for (int i = 0; i < dataList.size(); i++) {
-            if (favoriteCitiesList.contains(dataList.get(i).getName())) {
+            if (favoriteCitiesList.contains(String.valueOf(dataList.get(i).getId()))) {
                 dataList.get(i).setFavorite(true);
                 if (adapter != null) {
                     adapter.getDataList().get(i).setFavorite(true);
@@ -270,8 +271,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 if (separateCity != null && ((separateCity.getList().size() > 0))) {
                     toolbarImage.setVisibility(View.VISIBLE);
                     toolbarTitle.setVisibility(View.VISIBLE);
-                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(separateCity.getList().get(0).getName()), true,MainActivity.CITY_FRAGMENT_TAG);
-                     loader.end();
+                    ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(separateCity.getList().get(0).getName()), true, MainActivity.CITY_FRAGMENT_TAG);
+                    loader.end();
                 } else {
                     Toast.makeText(getActivity(), R.string.type_correct, Toast.LENGTH_SHORT).show();
                     toolbarImage.setVisibility(View.VISIBLE);
@@ -295,27 +296,28 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.slaq_button:
-               slaqButtonWork();
+                slaqButtonWork();
                 break;
         }
     }
-    private void slaqButtonWork(){
-        List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
+
+    private void slaqButtonWork() {
+        //List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
+        List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCitiesIdList(getActivity());
         if (!favoriteCitiesList.isEmpty()) {
-            if(NetworkController.isNetworkAvailable(getActivity())) {
+            if (NetworkController.isNetworkAvailable(getActivity())) {
                 ((MainActivity) getActivity()).pushFragment(favoritesFragment, true, MainActivity.FAVORITE_FRAGMENT_TAG);
-            }
-            else {
-                Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+            } else {
+                Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view), getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
                 snackbar.setAction("RETRY", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       slaqButtonWork();
+                        slaqButtonWork();
                     }
                 });
                 snackbar.setActionTextColor(Color.RED);
-                View snackBarView=snackbar.getView();
-                TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+                View snackBarView = snackbar.getView();
+                TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
                 snackBarTextView.setTextColor(Color.YELLOW);
                 snackbar.show();
             }
@@ -330,22 +332,25 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
         switch (view.getId()) {
             case R.id.custom_check_box:
                 if (weatherList.isFavorite()) {
-                    ShPrefController.addFavorites(getActivity(), weatherList.getName());
+                    //ShPrefController.addFavorites(getActivity(), weatherList.getName());
+                    ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
                 } else {
-                    ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+                    //ShPrefController.removeFavorite(getActivity(), weatherList.getName());
+                    ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
                 }
                 break;
             default:
-               mainItemClick(weatherList);
+                mainItemClick(weatherList);
                 break;
         }
     }
-    private void mainItemClick(final WeatherList weatherList){
+
+    private void mainItemClick(final WeatherList weatherList) {
         UIUtil.hideKeyboard(getActivity());
-        if(NetworkController.isNetworkAvailable(getActivity())){
-            ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true,MainActivity.CITY_FRAGMENT_TAG);
-        }else {
-            Snackbar snackbar=Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view),getActivity().getResources().getString(R.string.check_connection),Snackbar.LENGTH_SHORT);
+        if (NetworkController.isNetworkAvailable(getActivity())) {
+            ((MainActivity) getActivity()).pushFragment(CityFragment.newInstance(weatherList.getName()), true, MainActivity.CITY_FRAGMENT_TAG);
+        } else {
+            Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.toolbar_image_view), getActivity().getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
             snackbar.setAction("RETRY", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -353,8 +358,8 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
                 }
             });
             snackbar.setActionTextColor(Color.RED);
-            View snackBarView=snackbar.getView();
-            TextView snackBarTextView=snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            View snackBarView = snackbar.getView();
+            TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
             snackBarTextView.setTextColor(Color.YELLOW);
             snackbar.show();
         }
@@ -370,7 +375,7 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
 
     }
 
-    public  Loader getLoader(){
+    public Loader getLoader() {
         return loader;
     }
 }

@@ -2,6 +2,7 @@ package com.example.arturmusayelyan.myweatherforecast.dataController;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.arturmusayelyan.myweatherforecast.models.WeatherList;
 import com.google.gson.Gson;
@@ -48,6 +49,18 @@ public class ShPrefController {
         return new ArrayList<>();
     }
 
+    public static ArrayList<String> getAllFavoriteCitiesIdList(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(FAVORITE_lIST_KEY)) {
+            Gson gson = new Gson();
+            String json = preferences.getString(FAVORITE_lIST_KEY, null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            return gson.fromJson(json, type);
+        }
+        return new ArrayList<>();
+    }
+
 
     public static void addObject(Context context, WeatherList weatherList) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -79,7 +92,22 @@ public class ShPrefController {
         String list = gson.toJson(favoriteCitiesList);
         editor.putString(FAVORITE_lIST_KEY, list);
         editor.apply();
+    }
 
+    public static void addFavoritesById(Context context,String cityId){
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        ArrayList<String> favoriteCitiesIdList;
+        if (preferences.contains(FAVORITE_lIST_KEY)) {
+            favoriteCitiesIdList = getAllFavoriteCitiesIdList(context);
+        } else {
+            favoriteCitiesIdList = new ArrayList<>();
+        }
+        favoriteCitiesIdList.add(cityId);
+        SharedPreferences.Editor editor = preferences.edit();
+        Gson gson = new Gson();
+        String list = gson.toJson(favoriteCitiesIdList);
+        editor.putString(FAVORITE_lIST_KEY, list);
+        editor.apply();
     }
 
     /**
@@ -114,6 +142,18 @@ public class ShPrefController {
             SharedPreferences.Editor editor = preferences.edit();
             Gson gson = new Gson();
             String list = gson.toJson(favoriteCitiesList);
+            editor.putString(FAVORITE_lIST_KEY, list);
+            editor.apply();
+        }
+    }
+    public static void removeFavoritesById(Context context,String cityId){
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        ArrayList<String> favoriteCitiesIdList = getAllFavoriteCitiesIdList(context);
+        if (favoriteCitiesIdList.contains(cityId)) {
+            favoriteCitiesIdList.remove(cityId);
+            SharedPreferences.Editor editor = preferences.edit();
+            Gson gson = new Gson();
+            String list = gson.toJson(favoriteCitiesIdList);
             editor.putString(FAVORITE_lIST_KEY, list);
             editor.apply();
         }
@@ -173,7 +213,8 @@ public class ShPrefController {
     }
 
     public static String createQueryByFavorites(Context context) {
-        ArrayList<String> favoriteCitiesList = getAllFavoriteCities(context);
+        ArrayList<String> favoriteCitiesList = getAllFavoriteCitiesIdList(context);
+        Log.d("QueryResult",favoriteCitiesList.toString());
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < favoriteCitiesList.size(); i++) {
             builder.append(String.valueOf(favoriteCitiesList.get(i)));
