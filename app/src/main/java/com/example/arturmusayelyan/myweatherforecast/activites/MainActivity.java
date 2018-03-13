@@ -1,15 +1,20 @@
 package com.example.arturmusayelyan.myweatherforecast.activites;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.fragments.FavoritesFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
+import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
 
 public class MainActivity extends AppCompatActivity {
     public final static String MAIN_FRAGMENT_TAG = "mainFragmentTag";
@@ -27,18 +32,37 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MAIN_FRAGMENT_TAG);
-        if (mainFragment != null && mainFragment.isVisible() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            // Toast.makeText(this,"isVisible",Toast.LENGTH_SHORT).show();
+        if(NetworkController.isNetworkAvailable(this)) {
+            MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MAIN_FRAGMENT_TAG);
+            if (mainFragment != null && mainFragment.isVisible() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                // Toast.makeText(this,"isVisible",Toast.LENGTH_SHORT).show();
 
-            mainFragment.upDateData();
-        }
-        FavoritesFragment favoritesFragment = (FavoritesFragment) getSupportFragmentManager().findFragmentByTag(FAVORITE_FRAGMENT_TAG);
-        if (favoritesFragment != null && favoritesFragment.isVisible()) {
-            favoritesFragment.upDateData();
-        }
+                mainFragment.upDateData();
+            }
+            FavoritesFragment favoritesFragment = (FavoritesFragment) getSupportFragmentManager().findFragmentByTag(FAVORITE_FRAGMENT_TAG);
+            if (favoritesFragment != null && favoritesFragment.isVisible()) {
+                favoritesFragment.upDateData();
+            }
 
-        super.onBackPressed();
+            super.onBackPressed();
+        }
+        else {
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.toolbar_image_view),getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
+            snackbar.setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //dzrvapoxel
+                    //snackbar.setText(getResources().getString(R.string.check_connection)+" data can be false");
+                  MainActivity.super.onBackPressed();
+                }
+            });
+            snackbar.setActionTextColor(Color.RED);
+            View snackBarView = snackbar.getView();
+            TextView snackBarTextView = snackBarView.findViewById(android.support.design.R.id.snackbar_text);
+            snackBarTextView.setTextColor(Color.YELLOW);
+            snackbar.show();
+        }
     }
 
     public void pushFragment(Fragment fragment, boolean addToBackStack, String tag) {
