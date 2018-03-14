@@ -172,6 +172,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
                         adapter.notifyDataSetChanged();
                         // ShPrefController.addFavorites(getActivity(), weatherList.getName());
                         ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
+                        recyclerView.smoothScrollToPosition(adapter.getList().size()-1);
                     }
                 });
                 snackbar.addCallback(new Snackbar.Callback() {

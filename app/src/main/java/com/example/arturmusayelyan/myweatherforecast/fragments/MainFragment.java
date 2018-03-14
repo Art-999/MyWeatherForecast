@@ -156,7 +156,6 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
     }
 
     private List<WeatherList> syncFavorite(List<WeatherList> dataList) {
-       // List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCities(getActivity());
         List<String> favoriteCitiesList = ShPrefController.getAllFavoriteCitiesIdList(getActivity());
         Log.d("Favorite", favoriteCitiesList.toString());
         for (int i = 0; i < dataList.size(); i++) {

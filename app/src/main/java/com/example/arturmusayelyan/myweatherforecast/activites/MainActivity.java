@@ -32,29 +32,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(NetworkController.isNetworkAvailable(this)) {
+        if (NetworkController.isNetworkAvailable(this)) {
             MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentByTag(MAIN_FRAGMENT_TAG);
             if (mainFragment != null && mainFragment.isVisible() && getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                // Toast.makeText(this,"isVisible",Toast.LENGTH_SHORT).show();
-
                 mainFragment.upDateData();
             }
             FavoritesFragment favoritesFragment = (FavoritesFragment) getSupportFragmentManager().findFragmentByTag(FAVORITE_FRAGMENT_TAG);
             if (favoritesFragment != null && favoritesFragment.isVisible()) {
                 favoritesFragment.upDateData();
             }
-
             super.onBackPressed();
-        }
-        else {
-            final Snackbar snackbar = Snackbar.make(findViewById(R.id.toolbar_image_view),getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
-            snackbar.setAction("RETRY", new View.OnClickListener() {
+        } else {
+            final Snackbar snackbar = Snackbar.make(findViewById(R.id.toolbar_image_view), getResources().getString(R.string.check_connection), Snackbar.LENGTH_SHORT);
+            snackbar.setAction("BACK", new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    //dzrvapoxel
-                    //snackbar.setText(getResources().getString(R.string.check_connection)+" data can be false");
-                  MainActivity.super.onBackPressed();
+                    MainActivity.super.onBackPressed();
                 }
             });
             snackbar.setActionTextColor(Color.RED);
@@ -92,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
             mainFragment.upDateData();
         }
     }
-
 
     @Override
     protected void onResume() {
