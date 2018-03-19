@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    android:background="@color/customColorPrimary"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/email_field"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/card_view_message"
+        android:layout_alignRight="@id/card_view_message"
+        android:layout_margin="5dp"
+        android:inputType="textEmailAddress"
+        android:hint="your email address"
+        android:visibility="invisible"/>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view_message"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_below="@id/email_field"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:selectableItemBackground"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="50dp"
+        app:cardPreventCornerOverlap="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="6dp">
+
+            <EditText
+                android:inputType="textMultiLine"
+                android:background="@android:color/transparent"
+                android:id="@+id/message_field"
+                android:layout_width="match_parent"
+                android:gravity="start"
+                android:layout_height="250dp"
+                android:hint="message" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:text="Submit"
+        android:textAllCaps="false"
+        android:layout_below="@id/card_view_message"
+        android:layout_alignRight="@id/card_view_message"
+        android:layout_margin="1dp"
+        android:background="@null"
+        android:textColor="@android:color/holo_red_light"
+        android:textStyle="bold"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
