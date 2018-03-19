@@ -8,8 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
     <style name="CustomTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">#90caf9</item>
-        <item name="colorPrimaryDark">#5d99c6</item>
+        <item name="colorPrimary">@color/customColorPrimary</item>
+        <item name="colorPrimaryDark">@color/customColorPrimaryDark</item>
         <item name="colorAccent">@color/red</item>
     </style>
 

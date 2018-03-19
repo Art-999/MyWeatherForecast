@@ -17,4 +17,7 @@
     <color name="default_text_color">#555577</color>
     <color name="white">#ffffff</color>
     <color name="favorites_base_color">#ca4649</color>
+    <color name="customColorPrimary">#90caf9</color>
+    <color name="customColorPrimaryDark">#5d99c6</color>
+
 </resources>

@@ -2,16 +2,21 @@ package com.example.arturmusayelyan.myweatherforecast.activites;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
+import com.example.arturmusayelyan.myweatherforecast.fragments.ContactUsFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.FavoritesFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
 import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
@@ -20,13 +25,45 @@ public class MainActivity extends AppCompatActivity {
     public final static String MAIN_FRAGMENT_TAG = "mainFragmentTag";
     public final static String FAVORITE_FRAGMENT_TAG = "favoriteFragmentTag";
     public final static String CITY_FRAGMENT_TAG = "cityFragmentTag";
+    private final static String CONTACTUS_FRAGMENT = "contactUsFragment";
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        init();
         pushFragment(MainFragment.newInstance(), false, MAIN_FRAGMENT_TAG);
+    }
+
+    private void init() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                menuItem.setChecked(true);
+                switch (menuItem.getItemId()) {
+                    case R.id.main_list:
+                        pushFragment(MainFragment.newInstance(), false, MAIN_FRAGMENT_TAG);
+                        break;
+                    case R.id.favorite_list:
+                        pushFragment(FavoritesFragment.newInstance(), true, FAVORITE_FRAGMENT_TAG);
+                        break;
+                    case R.id.contact_us:
+                        pushFragment(ContactUsFragment.newInstance(), true, CONTACTUS_FRAGMENT);
+                        break;
+                    case R.id.exit:
+                        MainActivity.this.finish();
+                        break;
+                }
+
+                drawerLayout.closeDrawers();
+                return false;
+            }
+        });
     }
 
 
