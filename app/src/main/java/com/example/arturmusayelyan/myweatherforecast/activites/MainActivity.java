@@ -21,7 +21,9 @@ import com.example.arturmusayelyan.myweatherforecast.fragments.FavoritesFragment
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
 import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
 
-public class MainActivity extends AppCompatActivity {
+import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
+
+public class MainActivity extends AppCompatActivity implements DrawerLayout.DrawerListener {
     public final static String MAIN_FRAGMENT_TAG = "mainFragmentTag";
     public final static String FAVORITE_FRAGMENT_TAG = "favoriteFragmentTag";
     public final static String CITY_FRAGMENT_TAG = "cityFragmentTag";
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.addDrawerListener(this);
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -47,12 +50,15 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setChecked(true);
                 switch (menuItem.getItemId()) {
                     case R.id.main_list:
+                        //UIUtil.hideKeyboard(MainActivity.this);
                         pushFragment(MainFragment.newInstance(), false, MAIN_FRAGMENT_TAG);
                         break;
                     case R.id.favorite_list:
+                        //UIUtil.hideKeyboard(MainActivity.this);
                         pushFragment(FavoritesFragment.newInstance(), true, FAVORITE_FRAGMENT_TAG);
                         break;
                     case R.id.contact_us:
+                       // UIUtil.hideKeyboard(MainActivity.this);
                         pushFragment(ContactUsFragment.newInstance(), true, CONTACTUS_FRAGMENT);
                         break;
                     case R.id.exit:
@@ -131,5 +137,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+    }
+
+    @Override
+    public void onDrawerOpened(@NonNull View drawerView) {
+        UIUtil.hideKeyboard(MainActivity.this);
+    }
+
+    @Override
+    public void onDrawerClosed(@NonNull View drawerView) {
+
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {
+
     }
 }

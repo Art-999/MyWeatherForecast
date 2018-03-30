@@ -19,7 +19,27 @@ public class ShPrefController {
     private static final String SHARED_PREFERENCES_NAME = "sharedPreferencesName01";
     private static final String LIST_KEY = "Status_list";
     private static final String FAVORITE_lIST_KEY = "Status_favorite_list_key";
+    private static final String REPORT_MESSAGE_KEY = "Report_message_key";
 
+    public static void addReportMessage(Context context, String message) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+            clearReportMessage(context);
+
+        editor.putString(REPORT_MESSAGE_KEY, message);
+        editor.apply();
+    }
+
+    public static String getReportMessage(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        return preferences.getString(REPORT_MESSAGE_KEY, null);
+    }
+
+    public static void clearReportMessage(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        preferences.edit().remove(REPORT_MESSAGE_KEY).apply();
+    }
 
     /**
      * return WeatherList type arrayList from preferences
@@ -49,7 +69,7 @@ public class ShPrefController {
         return new ArrayList<>();
     }
 
-    public static ArrayList<String> getAllFavoriteCitiesIdList(Context context){
+    public static ArrayList<String> getAllFavoriteCitiesIdList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         if (preferences.contains(FAVORITE_lIST_KEY)) {
             Gson gson = new Gson();
@@ -94,7 +114,7 @@ public class ShPrefController {
         editor.apply();
     }
 
-    public static void addFavoritesById(Context context,String cityId){
+    public static void addFavoritesById(Context context, String cityId) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<String> favoriteCitiesIdList;
         if (preferences.contains(FAVORITE_lIST_KEY)) {
@@ -146,7 +166,8 @@ public class ShPrefController {
             editor.apply();
         }
     }
-    public static void removeFavoritesById(Context context,String cityId){
+
+    public static void removeFavoritesById(Context context, String cityId) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<String> favoriteCitiesIdList = getAllFavoriteCitiesIdList(context);
         if (favoriteCitiesIdList.contains(cityId)) {
@@ -214,7 +235,7 @@ public class ShPrefController {
 
     public static String createQueryByFavorites(Context context) {
         ArrayList<String> favoriteCitiesList = getAllFavoriteCitiesIdList(context);
-        Log.d("QueryResult",favoriteCitiesList.toString());
+        Log.d("QueryResult", favoriteCitiesList.toString());
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < favoriteCitiesList.size(); i++) {
             builder.append(String.valueOf(favoriteCitiesList.get(i)));
