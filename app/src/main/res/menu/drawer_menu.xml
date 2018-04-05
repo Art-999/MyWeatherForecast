@@ -16,6 +16,10 @@
             android:icon="@drawable/contract"
             android:title="contact us"/>
         <item
+            android:id="@+id/settings"
+            android:title="settings"
+            android:icon="@drawable/settings" />
+        <item
             android:id="@+id/exit"
             android:icon="@drawable/exit"
             android:title="exit"/>

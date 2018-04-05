@@ -132,10 +132,10 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                 if (buttonView.isPressed()) {
                     if (isChecked) {
                         // ShPrefController.addFavorites(getActivity(),cityName);
-                        ShPrefController.addFavoritesById(getActivity(), cityId);
+                        ShPrefController.addFavoritesById(getActivity(), cityId,cityName);
                     } else {
                         //ShPrefController.removeFavorite(getActivity(), cityName);
-                        ShPrefController.removeFavoritesById(getActivity(), cityId);
+                        ShPrefController.removeFavoritesById(getActivity(), cityId,cityName);
                     }
                 }
             }

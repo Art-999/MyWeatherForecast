@@ -18,15 +18,16 @@ import java.util.ArrayList;
 public class ShPrefController {
     private static final String SHARED_PREFERENCES_NAME = "sharedPreferencesName01";
     private static final String LIST_KEY = "Status_list";
-    private static final String FAVORITE_lIST_KEY = "Status_favorite_list_key";
+    private static final String FAVORITE_lIST_ID_KEY = "Status_favorite_list_ID_key";
+    private static final String FAVORITE_LIST_NAME_KEY = "Status_favorite_list_Name_key";
     private static final String REPORT_MESSAGE_KEY = "Report_message_key";
+    private static final String SPINNER_ITEM_ID_KEY = "Spinner_item_id_key";
+    private static final String SPINNER_ITEM_NAME_KEY = "Spinner_item_name_key";
 
     public static void addReportMessage(Context context, String message) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-
-            clearReportMessage(context);
-
+        clearReportMessage(context);
         editor.putString(REPORT_MESSAGE_KEY, message);
         editor.apply();
     }
@@ -59,9 +60,9 @@ public class ShPrefController {
 
     public static ArrayList<String> getAllFavoriteCities(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        if (preferences.contains(FAVORITE_lIST_KEY)) {
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
             Gson gson = new Gson();
-            String json = preferences.getString(FAVORITE_lIST_KEY, null);
+            String json = preferences.getString(FAVORITE_lIST_ID_KEY, null);
             Type type = new TypeToken<ArrayList<String>>() {
             }.getType();
             return gson.fromJson(json, type);
@@ -71,12 +72,35 @@ public class ShPrefController {
 
     public static ArrayList<String> getAllFavoriteCitiesIdList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        if (preferences.contains(FAVORITE_lIST_KEY)) {
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
             Gson gson = new Gson();
-            String json = preferences.getString(FAVORITE_lIST_KEY, null);
+            String json = preferences.getString(FAVORITE_lIST_ID_KEY, null);
             Type type = new TypeToken<ArrayList<String>>() {
             }.getType();
             return gson.fromJson(json, type);
+        }
+        return new ArrayList<>();
+    }
+
+    public static ArrayList<String> getAllFavoriteCitiesNameList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
+            Gson gson = new Gson();
+            String json = preferences.getString(FAVORITE_LIST_NAME_KEY, null);
+            Type type = new TypeToken<ArrayList<String>>() {
+            }.getType();
+            return gson.fromJson(json, type);
+        }
+        return new ArrayList<>();
+    }
+
+    public static ArrayList<WeatherList> getFavoriteCitiesMainList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
+            String json = preferences.getString(FAVORITE_lIST_ID_KEY, null);
+            Type type = new TypeToken<ArrayList<WeatherList>>() {
+            }.getType();
+            return new Gson().fromJson(json, type);
         }
         return new ArrayList<>();
     }
@@ -101,7 +125,7 @@ public class ShPrefController {
     public static void addFavorites(Context context, String cityName) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<String> favoriteCitiesList;
-        if (preferences.contains(FAVORITE_lIST_KEY)) {
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
             favoriteCitiesList = getAllFavoriteCities(context);
         } else {
             favoriteCitiesList = new ArrayList<>();
@@ -110,23 +134,45 @@ public class ShPrefController {
         SharedPreferences.Editor editor = preferences.edit();
         Gson gson = new Gson();
         String list = gson.toJson(favoriteCitiesList);
-        editor.putString(FAVORITE_lIST_KEY, list);
+        editor.putString(FAVORITE_lIST_ID_KEY, list);
         editor.apply();
     }
 
-    public static void addFavoritesById(Context context, String cityId) {
+    public static void addFavoritesById(Context context, String cityId, String cityName) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<String> favoriteCitiesIdList;
-        if (preferences.contains(FAVORITE_lIST_KEY)) {
+        ArrayList<String> favoriteCitiesNameList;
+        if (preferences.contains(FAVORITE_lIST_ID_KEY) && preferences.contains(FAVORITE_LIST_NAME_KEY)) {
             favoriteCitiesIdList = getAllFavoriteCitiesIdList(context);
+            favoriteCitiesNameList = getAllFavoriteCitiesNameList(context);
         } else {
             favoriteCitiesIdList = new ArrayList<>();
+            favoriteCitiesNameList = new ArrayList<>();
         }
         favoriteCitiesIdList.add(cityId);
+        favoriteCitiesNameList.add(cityName);
         SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String list = gson.toJson(favoriteCitiesIdList);
-        editor.putString(FAVORITE_lIST_KEY, list);
+        //Gson gson = new Gson();
+        String listId = new Gson().toJson(favoriteCitiesIdList);
+        String listName = new Gson().toJson(favoriteCitiesNameList);
+        editor.putString(FAVORITE_lIST_ID_KEY, listId);
+        editor.putString(FAVORITE_LIST_NAME_KEY, listName);
+        editor.apply();
+    }
+
+    public static void addFavoritesByFullObject(Context context, WeatherList weatherList) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        //String weatherListConvertedTostringObj = new Gson().toJson(weatherList);
+        ArrayList<WeatherList> favoriteCitesMainList;
+        if (preferences.contains(FAVORITE_lIST_ID_KEY)) {
+            favoriteCitesMainList = getFavoriteCitiesMainList(context);
+        } else {
+            favoriteCitesMainList = new ArrayList<>();
+        }
+        favoriteCitesMainList.add(weatherList);
+        SharedPreferences.Editor editor = preferences.edit();
+        String list = new Gson().toJson(favoriteCitesMainList);
+        editor.putString(FAVORITE_lIST_ID_KEY, list);
         editor.apply();
     }
 
@@ -162,20 +208,24 @@ public class ShPrefController {
             SharedPreferences.Editor editor = preferences.edit();
             Gson gson = new Gson();
             String list = gson.toJson(favoriteCitiesList);
-            editor.putString(FAVORITE_lIST_KEY, list);
+            editor.putString(FAVORITE_lIST_ID_KEY, list);
             editor.apply();
         }
     }
 
-    public static void removeFavoritesById(Context context, String cityId) {
+    public static void removeFavoritesById(Context context, String cityId, String cityName) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         ArrayList<String> favoriteCitiesIdList = getAllFavoriteCitiesIdList(context);
+        ArrayList<String> favoriteCitiesNameList = getAllFavoriteCitiesNameList(context);
         if (favoriteCitiesIdList.contains(cityId)) {
             favoriteCitiesIdList.remove(cityId);
+            favoriteCitiesNameList.remove(cityName);
             SharedPreferences.Editor editor = preferences.edit();
-            Gson gson = new Gson();
-            String list = gson.toJson(favoriteCitiesIdList);
-            editor.putString(FAVORITE_lIST_KEY, list);
+            //Gson gson = new Gson();
+            String listId = new Gson().toJson(favoriteCitiesIdList);
+            String listName = new Gson().toJson(favoriteCitiesNameList);
+            editor.putString(FAVORITE_lIST_ID_KEY, listId);
+            editor.putString(FAVORITE_LIST_NAME_KEY, listName);
             editor.apply();
         }
     }
@@ -198,7 +248,7 @@ public class ShPrefController {
         SharedPreferences.Editor editor = preferences.edit();
         Gson gson = new Gson();
         String list = gson.toJson(allFavoriteCities);
-        editor.putString(FAVORITE_lIST_KEY, list);
+        editor.putString(FAVORITE_lIST_ID_KEY, list);
         editor.apply();
     }
 
@@ -245,5 +295,35 @@ public class ShPrefController {
         return result;
     }
 
+    public static void addSpinnerSelectedItemId(Context context, int id) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPINNER_ITEM_ID_KEY, Integer.toString(id));
+        editor.apply();
+    }
+
+
+    public static String getSpinnerSelectedItemId(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(SPINNER_ITEM_ID_KEY)) {
+            return preferences.getString(SPINNER_ITEM_ID_KEY, null);
+        }
+        return null;
+    }
+
+    public static void addSpinnerSelectedItemName(Context context, String name) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SPINNER_ITEM_NAME_KEY, name);
+        editor.apply();
+    }
+
+    public static String getSpinnerSelectedItemName(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(SPINNER_ITEM_NAME_KEY)) {
+            return preferences.getString(SPINNER_ITEM_NAME_KEY, null);
+        }
+        return null;
+    }
 
 }

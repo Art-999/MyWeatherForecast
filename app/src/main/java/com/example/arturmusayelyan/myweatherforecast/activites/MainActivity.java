@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -19,6 +20,7 @@ import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.fragments.ContactUsFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.FavoritesFragment;
 import com.example.arturmusayelyan.myweatherforecast.fragments.MainFragment;
+import com.example.arturmusayelyan.myweatherforecast.fragments.SettingsFragment;
 import com.example.arturmusayelyan.myweatherforecast.networking.NetworkController;
 
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
     public final static String FAVORITE_FRAGMENT_TAG = "favoriteFragmentTag";
     public final static String CITY_FRAGMENT_TAG = "cityFragmentTag";
     private final static String CONTACTUS_FRAGMENT = "contactUsFragment";
+    private final static String SETTINGS_FRAGMENT="settingsFragment";
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -38,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         init();
         pushFragment(MainFragment.newInstance(), false, MAIN_FRAGMENT_TAG);
+
+        String locale=this.getResources().getConfiguration().locale.getDisplayName();
+        Log.d("Locale",locale);
     }
 
     private void init() {
@@ -63,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
                         break;
                     case R.id.exit:
                         MainActivity.this.finish();
+                        break;
+                    case R.id.settings:
+                        pushFragment(SettingsFragment.newInstance(),true,SETTINGS_FRAGMENT);
                         break;
                 }
 

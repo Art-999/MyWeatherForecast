@@ -332,10 +332,10 @@ public class MainFragment extends Fragment implements View.OnClickListener, Main
             case R.id.custom_check_box:
                 if (weatherList.isFavorite()) {
                     //ShPrefController.addFavorites(getActivity(), weatherList.getName());
-                    ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
+                    ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()),weatherList.getName());
                 } else {
                     //ShPrefController.removeFavorite(getActivity(), weatherList.getName());
-                    ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
+                    ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()),weatherList.getName());
                 }
                 break;
             default:

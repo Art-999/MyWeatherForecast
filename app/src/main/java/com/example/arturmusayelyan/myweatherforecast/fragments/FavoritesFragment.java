@@ -163,7 +163,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
                 adapter.notifyItemRemoved(position);
                 adapter.notifyItemRangeChanged(0, adapter.getList().size());
                 //ShPrefController.removeFavorite(getActivity(), weatherList.getName());
-                ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
+                ShPrefController.removeFavoritesById(getActivity(), String.valueOf(weatherList.getId()),weatherList.getName());
                 final Snackbar snackbar = Snackbar.make(view, weatherList.getName() + " " + getActivity().getResources().getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT);
                 snackbar.setAction("UNDO", new View.OnClickListener() {
                     @Override
@@ -171,7 +171,7 @@ public class FavoritesFragment extends Fragment implements FavoriteFragmentItemC
                         adapter.getList().add(weatherList);
                         adapter.notifyDataSetChanged();
                         // ShPrefController.addFavorites(getActivity(), weatherList.getName());
-                        ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()));
+                        ShPrefController.addFavoritesById(getActivity(), String.valueOf(weatherList.getId()),weatherList.getName());
                         recyclerView.smoothScrollToPosition(adapter.getList().size()-1);
                     }
                 });
