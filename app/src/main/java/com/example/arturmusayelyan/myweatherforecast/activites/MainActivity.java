@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
     public final static String MAIN_FRAGMENT_TAG = "mainFragmentTag";
     public final static String FAVORITE_FRAGMENT_TAG = "favoriteFragmentTag";
     public final static String CITY_FRAGMENT_TAG = "cityFragmentTag";
-    private final static String CONTACTUS_FRAGMENT = "contactUsFragment";
+    private final static String CONTACT_US_FRAGMENT = "contactUsFragment";
     private final static String SETTINGS_FRAGMENT="settingsFragment";
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
                         break;
                     case R.id.contact_us:
                        // UIUtil.hideKeyboard(MainActivity.this);
-                        pushFragment(ContactUsFragment.newInstance(), true, CONTACTUS_FRAGMENT);
+                        pushFragment(ContactUsFragment.newInstance(), true, CONTACT_US_FRAGMENT);
                         break;
                     case R.id.exit:
                         MainActivity.this.finish();
