@@ -122,7 +122,7 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.submit:
                 sendEmail();
-                ShPrefController.clearReportMessage(getActivity());
+                ShPrefController.cleanReportMessage(getActivity());
                 break;
         }
     }

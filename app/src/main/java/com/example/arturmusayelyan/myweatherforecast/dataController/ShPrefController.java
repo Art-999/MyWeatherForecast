@@ -27,7 +27,7 @@ public class ShPrefController {
     public static void addReportMessage(Context context, String message) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        clearReportMessage(context);
+        cleanReportMessage(context);
         editor.putString(REPORT_MESSAGE_KEY, message);
         editor.apply();
     }
@@ -37,7 +37,7 @@ public class ShPrefController {
         return preferences.getString(REPORT_MESSAGE_KEY, null);
     }
 
-    public static void clearReportMessage(Context context) {
+    public static void cleanReportMessage(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         preferences.edit().remove(REPORT_MESSAGE_KEY).apply();
     }

@@ -151,6 +151,10 @@ public class CityFragment extends Fragment implements View.OnClickListener {
             public void onResponse(Call<SeparateCity> call, Response<SeparateCity> response) {
                 SeparateCity separateCity = response.body();
                 List currentCity = separateCity.getList().get(0);
+                Log.d("DataWatching",currentCity.toString());
+                Log.d("DataWatching",currentCity.getWeather().get(0).getMain());
+                boolean isRainy=(currentCity.getWeather().get(0).getMain().equals("Rain"));
+                Log.d("DataWatching",isRainy+"");
 
                 Double temp = currentCity.getMain().getTemp();
                 int tempInt = Integer.valueOf(temp.intValue());
@@ -159,6 +163,7 @@ public class CityFragment extends Fragment implements View.OnClickListener {
                 String weatherMainDescription = currentCity.getWeather().get(0).getMain();
                 Log.d("Description", weatherDescription);
                 Log.d("mainDescription", weatherMainDescription);
+
 
                 windSpeedTv.setText(currentCity.getWind().getSpeed() + "mph");
                 humidityTv.setText(currentCity.getMain().getHumidity() + "%");

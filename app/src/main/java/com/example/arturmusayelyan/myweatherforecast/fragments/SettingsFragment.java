@@ -20,7 +20,7 @@ import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefContro
 public class SettingsFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener {
     private ToggleButton toggleButton;
     private Spinner spinner;
-    private int spinerSelectedId;
+    private int spinnerSelectedId;
 
     public SettingsFragment() {
 
@@ -32,6 +32,12 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
         fragment.setArguments(args);
         return fragment;
     }
+
+//    @Override
+//    public void onCreate(@Nullable Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        addPreferencesFromResource(R.xml.fragment_settings_preferences);
+//    }
 
     @Nullable
     @Override
@@ -71,8 +77,8 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        spinerSelectedId = position;
-        Log.d("ID", spinerSelectedId + "");
+        spinnerSelectedId = position;
+        Log.d("ID", spinnerSelectedId + "");
     }
 
     @Override
@@ -84,9 +90,9 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     public void onResume() {
         super.onResume();
         if (ShPrefController.getSpinnerSelectedItemId(getActivity()) != null) {
-            spinerSelectedId = Integer.parseInt(ShPrefController.getSpinnerSelectedItemId(getActivity()));
+            spinnerSelectedId = Integer.parseInt(ShPrefController.getSpinnerSelectedItemId(getActivity()));
             if(ShPrefController.getAllFavoriteCitiesNameList(getActivity()).contains(ShPrefController.getSpinnerSelectedItemName(getActivity()))){
-                spinner.setSelection(spinerSelectedId);
+                spinner.setSelection(spinnerSelectedId);
             }
 
         }
@@ -95,7 +101,7 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     @Override
     public void onPause() {
         super.onPause();
-        ShPrefController.addSpinnerSelectedItemId(getActivity(), spinerSelectedId);
-        ShPrefController.addSpinnerSelectedItemName(getActivity(),spinner.getAdapter().getItem(spinerSelectedId).toString());
+        ShPrefController.addSpinnerSelectedItemId(getActivity(), spinnerSelectedId);
+        ShPrefController.addSpinnerSelectedItemName(getActivity(),spinner.getAdapter().getItem(spinnerSelectedId).toString());
     }
 }
