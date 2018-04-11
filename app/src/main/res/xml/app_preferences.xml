@@ -5,7 +5,6 @@
         android:defaultValue="false"
         android:key="switch_key"
         android:title="Switch notifications" />
-    <ListPreference
-        ></ListPreference>
+    <ListPreference></ListPreference>
 
 </PreferenceScreen>

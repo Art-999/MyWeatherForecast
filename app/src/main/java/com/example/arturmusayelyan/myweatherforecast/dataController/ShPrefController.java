@@ -23,6 +23,22 @@ public class ShPrefController {
     private static final String REPORT_MESSAGE_KEY = "Report_message_key";
     private static final String SPINNER_ITEM_ID_KEY = "Spinner_item_id_key";
     private static final String SPINNER_ITEM_NAME_KEY = "Spinner_item_name_key";
+    private static final String TOGGLE_BUTTON_STATE_KEY = "toggle_button_state_kay";
+
+    public static void saveToggleButtonState(Context context, boolean isChecked) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(TOGGLE_BUTTON_STATE_KEY, isChecked);
+        editor.apply();
+    }
+
+    public static boolean getToggleButtonState(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        if (preferences.contains(TOGGLE_BUTTON_STATE_KEY)) {
+            return preferences.getBoolean(TOGGLE_BUTTON_STATE_KEY, false);
+        }
+        return false;
+    }
 
     public static void addReportMessage(Context context, String message) {
         SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
