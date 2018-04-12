@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
     private NavigationView navigationView;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

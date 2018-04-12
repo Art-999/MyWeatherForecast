@@ -97,6 +97,7 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
         Log.d("Example", "On start worked");
         if (reportMessage != null && reportMessage.length() > 0) {
             emailBodyEditText.setText(reportMessage);
+            emailBodyEditText.requestFocus(reportMessage.length());
         }
         super.onStart();
     }
