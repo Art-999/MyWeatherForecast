@@ -1,15 +1,12 @@
 package com.example.arturmusayelyan.myweatherforecast.fragments;
 
-import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +29,9 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     private int spinnerSelectedId;
     private JobScheduler myJobScheduler;
     private static int JOB_ID = 0;
+    public static String selectedCityName;
+    public static boolean isAppAlive;
+    public static boolean toogleButtonStateChacked;
 
     public SettingsFragment() {
 
@@ -44,11 +44,6 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
         return fragment;
     }
 
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        addPreferencesFromResource(R.xml.fragment_settings_preferences);
-//    }
 
     @Nullable
     @Override
@@ -59,8 +54,8 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         init(view);
+        isAppAlive =true;
     }
 
     private void init(View view) {
@@ -76,29 +71,32 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
         spinner.setEnabled(false);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
-            cancelJob();
+            //cancelJob();
             // Log.d("Names", ShPrefController.getAllFavoriteCitiesNameList(getActivity()).toString());
+            toogleButtonStateChacked=true;
             spinner.setEnabled(true);
-            scheduleJob();
+                scheduleJob();
         } else {
             //  Log.d("Names", ShPrefController.getAllFavoriteCitiesNameList(getActivity()).toString());
+            toogleButtonStateChacked=false;
             spinner.setEnabled(false);
             cancelJob();
-            Toast.makeText(getActivity(), "At this time you don’t receive notification about rainy days", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "At this time you don’t receive notification about weather", Toast.LENGTH_LONG).show();
         }
 
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        cancelJob();
         spinnerSelectedId = position;
         Log.d("ID", spinnerSelectedId + "");
-        cancelJob();
+        selectedCityName=spinner.getSelectedItem().toString();
+
         scheduleJob();
     }
 
@@ -123,30 +121,43 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     public void onPause() {
         super.onPause();
         ShPrefController.addSpinnerSelectedItemId(getActivity(), spinnerSelectedId);
-        ShPrefController.addSpinnerSelectedItemName(getActivity(), spinner.getAdapter().getItem(spinnerSelectedId).toString());
+        //ShPrefController.addSpinnerSelectedItemName(getActivity(), spinner.getAdapter().getItem(spinnerSelectedId).toString());
+        ShPrefController.addSpinnerSelectedItemName(getActivity(), selectedCityName);
 
         ShPrefController.saveToggleButtonState(getActivity(), toggleButton.isChecked());
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     public void scheduleJob() {
         myJobScheduler = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         ComponentName serviceName = new ComponentName(getActivity().getPackageName(), NotificationJobService.class.getName());
 
         JobInfo.Builder builder=new JobInfo.Builder(JOB_ID,serviceName);
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        builder.setPeriodic(1800000);
+        builder.setPeriodic(14000);
 
         JobInfo myJobInfo=builder.build();
         myJobScheduler.schedule(myJobInfo);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
+
     public void cancelJob() {
         if (myJobScheduler != null) {
             myJobScheduler.cancelAll();
-           // myJobScheduler = null;
+            myJobScheduler = null;
         }
+    }
+
+    @Override
+    public void onStop() {
+        isAppAlive =false;
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
     }
 }

@@ -9,10 +9,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.arturmusayelyan.myweatherforecast.R;
 import com.example.arturmusayelyan.myweatherforecast.activites.MainActivity;
 import com.example.arturmusayelyan.myweatherforecast.dataController.ShPrefController;
+import com.example.arturmusayelyan.myweatherforecast.fragments.SettingsFragment;
 import com.example.arturmusayelyan.myweatherforecast.models.List;
 import com.example.arturmusayelyan.myweatherforecast.models.SeparateCity;
 import com.example.arturmusayelyan.myweatherforecast.networking.WebServiceManager;
@@ -33,13 +35,31 @@ public class NotificationJobService extends JobService {
     private final String MIST = "Mist";
     private final String HAZE = "Haze";
     private final String DRIZZLE = "DRIZZLE";
-    private boolean isRainy;
+
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        String selectedCity = ShPrefController.getSpinnerSelectedItemName(this);
+        //String selectedCity = ShPrefController.getSpinnerSelectedItemName(this);
+        Log.d("OnStartJob","worked1");
+        String selectedCity = null;
+        if (SettingsFragment.isAppAlive) {
+            Log.d("OnStartJob","condition 1");
+            selectedCity = SettingsFragment.selectedCityName;
+        } else if (!SettingsFragment.isAppAlive && ShPrefController.getToggleButtonState(this)) {
+            Log.d("OnStartJob","condition 2");
+            selectedCity = ShPrefController.getSpinnerSelectedItemName(this);
+        }
+
         if (selectedCity != null) {
-            doSelectedCityCall(selectedCity);
+            Log.d("OnStartJob","condition 3");
+            if (SettingsFragment.isAppAlive && SettingsFragment.toogleButtonStateChacked) {
+                Log.d("OnStartJob","condition 4");
+                doSelectedCityCall(selectedCity);
+            }else if(!SettingsFragment.isAppAlive && ShPrefController.getToggleButtonState(this)){
+                Log.d("OnStartJob","condition 5");
+                doSelectedCityCall(selectedCity);
+            }
+
         }
         return false;
     }
@@ -75,11 +95,7 @@ public class NotificationJobService extends JobService {
         PendingIntent contentPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).
-                setContentTitle(getString(R.string.app_name))
-                .setContentIntent(contentPendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setAutoCancel(true);
+                setContentTitle(getString(R.string.app_name)).setContentIntent(contentPendingIntent).setPriority(NotificationCompat.PRIORITY_HIGH).setDefaults(NotificationCompat.DEFAULT_ALL).setAutoCancel(true);
 //                    .setContentText("it's rainy today take umbrella with you")
 //                    .setSmallIcon(R.drawable.rainy);
         switch (weatherDescription) {
