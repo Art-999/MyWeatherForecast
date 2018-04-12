@@ -26,6 +26,7 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
     private EditText emailAddress;
     private EditText emailBodyEditText;
     private String emailBody;
+    private String reportMessage;
 
     public ContactUsFragment() {
 
@@ -78,6 +79,8 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
         // intent.setData(Uri.parse(yourAddress));
         // startActivity(intent);
         startActivity(Intent.createChooser(emailIntent, "Select Email Sending App"));
+        ShPrefController.cleanReportMessage(getActivity());
+        reportMessage=null;
 //        startActivity(emailIntent);
 //        startActivity(intent);
     }
@@ -90,26 +93,36 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onStart() {
-        super.onStart();
+            reportMessage = getEmailBodyFromPreferences();
         Log.d("Example", "On start worked");
-        String reportMessage = getEmailBodyFromPreferences();
         if (reportMessage != null && reportMessage.length() > 0) {
             emailBodyEditText.setText(reportMessage);
         }
+        super.onStart();
+    }
+    public boolean isFragmentUIActive() {
+        return isAdded() && !isDetached() && isVisible();
     }
 
     @Override
     public void onPause() {
        // UIUtil.hideKeyboard(getActivity());
-        super.onPause();
 
+        reportMessage=emailBodyEditText.getText().toString().trim();
+        ShPrefController.addReportMessage(getActivity(), reportMessage);
+        super.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d("Example", "On stop worked");
-        ShPrefController.addReportMessage(getActivity(), emailBodyEditText.getText().toString().trim());
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -122,7 +135,6 @@ public class ContactUsFragment extends Fragment implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.submit:
                 sendEmail();
-                ShPrefController.cleanReportMessage(getActivity());
                 break;
         }
     }

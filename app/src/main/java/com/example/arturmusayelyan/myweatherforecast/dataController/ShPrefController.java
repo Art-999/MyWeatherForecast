@@ -16,6 +16,8 @@ import java.util.ArrayList;
  */
 
 public class ShPrefController {
+
+    // SharedPreferences preferences = .getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
     private static final String SHARED_PREFERENCES_NAME = "sharedPreferencesName01";
     private static final String LIST_KEY = "Status_list";
     private static final String FAVORITE_lIST_ID_KEY = "Status_favorite_list_ID_key";
@@ -123,19 +125,25 @@ public class ShPrefController {
 
 
     public static void addObject(Context context, WeatherList weatherList) {
-        SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        ArrayList<WeatherList> citiesGroupWeatherList;
-        if (preferences.contains(LIST_KEY)) {
-            citiesGroupWeatherList = getAllObjects(context);
-        } else {
-            citiesGroupWeatherList = new ArrayList<>();
+        if (context !=null){
+            Log.d("ART_LOG", context.toString());
+            if (context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE) != null) {
+                SharedPreferences preferences = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+                ArrayList<WeatherList> citiesGroupWeatherList;
+                if (preferences.contains(LIST_KEY)) {
+                    citiesGroupWeatherList = getAllObjects(context);
+                } else {
+                    citiesGroupWeatherList = new ArrayList<>();
+                }
+                citiesGroupWeatherList.add(weatherList);
+                SharedPreferences.Editor editor = preferences.edit();
+                Gson gson = new Gson();
+                String list = gson.toJson(citiesGroupWeatherList);
+                editor.putString(LIST_KEY, list);
+                editor.apply();
+            }
         }
-        citiesGroupWeatherList.add(weatherList);
-        SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String list = gson.toJson(citiesGroupWeatherList);
-        editor.putString(LIST_KEY, list);
-        editor.apply();
+
     }
 
     public static void addFavorites(Context context, String cityName) {

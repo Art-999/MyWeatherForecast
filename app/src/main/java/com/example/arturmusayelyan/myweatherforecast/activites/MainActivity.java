@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,17 +64,17 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
                         break;
                     case R.id.favorite_list:
                         //UIUtil.hideKeyboard(MainActivity.this);
-                        pushFragment(FavoritesFragment.newInstance(), true, FAVORITE_FRAGMENT_TAG);
+                        pushFragment(FavoritesFragment.newInstance(), false, FAVORITE_FRAGMENT_TAG);
                         break;
                     case R.id.contact_us:
                        // UIUtil.hideKeyboard(MainActivity.this);
-                        pushFragment(ContactUsFragment.newInstance(), true, CONTACT_US_FRAGMENT);
+                        pushFragment(ContactUsFragment.newInstance(), false, CONTACT_US_FRAGMENT);
                         break;
                     case R.id.exit:
                         MainActivity.this.finish();
                         break;
                     case R.id.settings:
-                        pushFragment(SettingsFragment.newInstance(),true,SETTINGS_FRAGMENT);
+                        pushFragment(SettingsFragment.newInstance(),false,SETTINGS_FRAGMENT);
                         break;
                 }
 
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLayout.Draw
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         if (addToBackStack) {
+            //fragment.setUserVisibleHint(true);
             transaction.add(R.id.base_fragment_container, fragment, tag);
             transaction.addToBackStack(fragment.getClass().getSimpleName());
         } else {

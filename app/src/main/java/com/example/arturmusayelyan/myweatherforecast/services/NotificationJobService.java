@@ -52,7 +52,7 @@ public class NotificationJobService extends JobService {
 
         if (selectedCity != null) {
             Log.d("OnStartJob","condition 3");
-            if (SettingsFragment.isAppAlive && SettingsFragment.toogleButtonStateChacked) {
+            if (SettingsFragment.isAppAlive && SettingsFragment.toggleButtonStateChecked) {
                 Log.d("OnStartJob","condition 4");
                 doSelectedCityCall(selectedCity);
             }else if(!SettingsFragment.isAppAlive && ShPrefController.getToggleButtonState(this)){
@@ -95,9 +95,11 @@ public class NotificationJobService extends JobService {
         PendingIntent contentPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).
-                setContentTitle(getString(R.string.app_name)).setContentIntent(contentPendingIntent).setPriority(NotificationCompat.PRIORITY_HIGH).setDefaults(NotificationCompat.DEFAULT_ALL).setAutoCancel(true);
-//                    .setContentText("it's rainy today take umbrella with you")
-//                    .setSmallIcon(R.drawable.rainy);
+                setContentTitle(getString(R.string.app_name)).
+                setContentIntent(contentPendingIntent).
+                setPriority(NotificationCompat.PRIORITY_HIGH).
+                setDefaults(NotificationCompat.DEFAULT_ALL).
+                setAutoCancel(true);
         switch (weatherDescription) {
             case CLEAR_SKY:
                 if (weatherIcon.endsWith("d")) {

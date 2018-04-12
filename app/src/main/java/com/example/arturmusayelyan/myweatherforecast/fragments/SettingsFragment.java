@@ -31,7 +31,7 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
     private static int JOB_ID = 0;
     public static String selectedCityName;
     public static boolean isAppAlive;
-    public static boolean toogleButtonStateChacked;
+    public static boolean toggleButtonStateChecked;
 
     public SettingsFragment() {
 
@@ -77,12 +77,12 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
         if (isChecked) {
             //cancelJob();
             // Log.d("Names", ShPrefController.getAllFavoriteCitiesNameList(getActivity()).toString());
-            toogleButtonStateChacked=true;
+            toggleButtonStateChecked =true;
             spinner.setEnabled(true);
                 scheduleJob();
         } else {
             //  Log.d("Names", ShPrefController.getAllFavoriteCitiesNameList(getActivity()).toString());
-            toogleButtonStateChacked=false;
+            toggleButtonStateChecked =false;
             spinner.setEnabled(false);
             cancelJob();
             Toast.makeText(getActivity(), "At this time you don’t receive notification about weather", Toast.LENGTH_LONG).show();
@@ -134,7 +134,7 @@ public class SettingsFragment extends Fragment implements CompoundButton.OnCheck
 
         JobInfo.Builder builder=new JobInfo.Builder(JOB_ID,serviceName);
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-        builder.setPeriodic(14000);
+        builder.setPeriodic(10000);
 
         JobInfo myJobInfo=builder.build();
         myJobScheduler.schedule(myJobInfo);
